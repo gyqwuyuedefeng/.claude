@@ -1,0 +1,19 @@
+{
+  "session_id": "workflow-template",
+  "overall_plan": "plan/overall-plan.md",
+  "phases_index": "plan/phases.md",
+  "start_time": null,
+  "current_phase": null,
+  "current_task": null,
+  "status": "initialized",
+  "phases": [],
+  "statistics": {
+    "total_phases": 0,
+    "total_tasks": 0,
+    "completed_tasks": 0,
+    "failed_tasks": 0,
+    "in_progress_tasks": 0,
+    "pending_tasks": 0
+  },
+  "last_updated": null
+}

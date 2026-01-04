@@ -1,0 +1,117 @@
+# 工作流会话记录模板
+
+## 会话信息
+- 创建时间：{YYYY-MM-DD HH:MM:SS}
+- 会话ID：workflow-{timestamp}
+
+## 用户需求
+{完整的用户提示词}
+
+## 涉及项目
+1. {项目路径1} - {项目名称1}
+2. {项目路径2} - {项目名称2}
+
+## 需求分类
+- 类型：{新功能|bug修复|重构|优化|其他}
+- 复杂度评估：{简单|中等|复杂}
+- 是否需要完整工作流：{是|否}
+
+## 调度序列
+
+- [x] workflow-orchestrator - {时间} - 完成需求解析
+- [ ] project-info-builder - 待调度 - {项目名}
+- [ ] issue-analyzer - 待调度 - {项目名}
+- [ ] analysis-aggregator - 待调度
+- [ ] master-planner - 待调度
+- [ ] plan-splitter - 待调度
+- [ ] code-executor - 待调度
+- [ ] test-runner - 待调度
+- [ ] code-auditor - 待调度
+- [ ] auto-fixer - 待调度（条件触发）
+- [ ] task-summarizer - 待调度
+
+## 状态流转
+
+- {时间} - 工作流初始化
+- {时间} - 开始需求分析
+- {时间} - 完成项目信息检查
+- {时间} - 调度 issue-analyzer
+- {时间} - 汇总分析完成
+- {时间} - 生成整体计划
+- {时间} - 用户确认计划
+- {时间} - 拆分任务
+- {时间} - 开始执行任务
+- ...
+
+## 项目信息状态
+
+### {项目1名称}
+- 路径：{project_path}
+- project.info：{存在|已生成|更新中}
+- 最后更新：{时间}
+
+### {项目2名称}
+- 路径：{project_path}
+- project.info：{存在|已生成|更新中}
+- 最后更新：{时间}
+
+## 分析结果
+
+### {项目1名称}
+- 分析报告：`analysis/{project1}-analysis.md`
+- 关键模块数：{N}
+- 风险点数：{M}
+- 状态：{完成|进行中}
+
+### {项目2名称}
+- 分析报告：`analysis/{project2}-analysis.md`
+- 关键模块数：{N}
+- 风险点数：{M}
+- 状态：{完成|进行中}
+
+## 计划状态
+
+- 整体计划：`plan/overall-plan.md`
+- 计划状态：{草稿|待确认|已批准|已拆分}
+- 阶段索引：`plan/phases.md`
+- 总阶段数：{N}
+- 总任务数：{M}
+
+## 执行进度
+
+- 当前阶段：{phase_id}
+- 当前任务：{task_id}
+- 已完成任务：{completed}/{total}
+- 整体进度：{percentage}%
+
+## 问题记录
+
+### 问题1
+- 时间：{timestamp}
+- 阶段：{stage}
+- 描述：{description}
+- 状态：{已解决|处理中|待处理}
+- 解决方案：{solution}
+
+### 问题2
+...
+
+## 决策记录
+
+### 决策1：{决策主题}
+- 时间：{timestamp}
+- 问题：{description}
+- 选项：{options}
+- 决定：{decision}
+- 理由：{reason}
+
+### 决策2：...
+
+## 备注
+
+{任何需要记录的额外信息}
+
+---
+
+**最后更新**：{YYYY-MM-DD HH:MM:SS}
+**工作流状态**：{初始化|分析中|计划中|执行中|已完成|已暂停|失败}
