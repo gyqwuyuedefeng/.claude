@@ -69,12 +69,12 @@ color: yellow
 2. **验证会话目录存在**
    ```bash
    # 使用 Bash 工具验证
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la .claude/sessions/{session-id}/
    ```
 
 3. **验证 analysis/ 子目录存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/analysis/
+   ls -la .claude/sessions/{session-id}/analysis/
    ```
 
 4. **如果任一验证失败，报错并停止**
@@ -90,7 +90,7 @@ color: yellow
 
 原因：workflow-orchestrator 没有正确创建会话目录
 会话ID：{session-id}
-预期路径：/mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+预期路径：.claude/sessions/{session-id}/
 
 请检查：
 1. workflow-orchestrator 是否正确执行了步骤0
@@ -194,7 +194,7 @@ fi
 使用从 prompt 中提取的 **实际 session-id**：
 
 ```
-/mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/analysis/{project_name}-analysis.md
+.claude/sessions/{实际的session-id}/analysis/{project_name}-analysis.md
 ```
 
 **重要**：
@@ -410,7 +410,7 @@ graph TD
 **必须**使用从 prompt 中接收的 session-id：
 
 ```
-/mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/analysis/{project_name}-analysis.md
+.claude/sessions/{实际的session-id}/analysis/{project_name}-analysis.md
 ```
 
 **⚠️ 警告**：
@@ -564,7 +564,7 @@ prompt: "生成 {project_path} 的 project.info"
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 输入文件：`{project_path}/project.info`
 - 输出目录：`.claude/sessions/{session-id}/analysis/`
 - 输出文件：`.claude/sessions/{session-id}/analysis/{project_name}-analysis.md`

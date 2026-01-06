@@ -325,6 +325,6 @@ find {project_path} -type f -name "*.py" | wc -l
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 输出文件：`{project_path}/project.info`
 - 相关子代理：`workflow-orchestrator`, `project-info-updater`

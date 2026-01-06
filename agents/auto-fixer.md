@@ -551,7 +551,7 @@ subagent_type: "code-auditor"
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 任务目录：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/`
 - 输入文件：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/audit/audit-{latest}.md`
 - 输出文件：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/audit/auto-fix-log.md`

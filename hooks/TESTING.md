@@ -84,12 +84,12 @@ cat <<'EOF' | python3 ../../hooks/sync-all-state.py
 {
   "tool_name": "Write",
   "tool_input": {
-    "file_path": "/mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统-20260105-0920/workflow/progress.json"
+    "file_path": "<项目根目录>/.claude/sessions/001-积分扣减系统-20260105-0920/workflow/progress.json"
   },
   "tool_response": {
     "success": true
   },
-  "cwd": "/mnt/d/software/beilv-agent"
+  "cwd": "<项目根目录>"
 }
 EOF
 
@@ -99,8 +99,8 @@ tail -20 workflow/session.md
 # 4. 手动触发 verify-and-fix-state.py
 cat <<'EOF' | python3 ../../hooks/verify-and-fix-state.py
 {
-  "cwd": "/mnt/d/software/beilv-agent",
-  "transcript_path": "/mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统-20260105-0920/transcript.jsonl"
+  "cwd": "<项目根目录>",
+  "transcript_path": "<项目根目录>/.claude/sessions/001-积分扣减系统-20260105-0920/transcript.jsonl"
 }
 EOF
 ```

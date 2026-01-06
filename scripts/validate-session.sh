@@ -12,7 +12,10 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 配置
-SESSION_DIR="/mnt/d/software/beilv-agent/.claude/sessions"
+# 动态获取项目根目录（脚本在 .claude/scripts/ 下）
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+SESSION_DIR="$PROJECT_ROOT/.claude/sessions"
 REQUIRED_SUBDIRS=("analysis" "planning" "execution" "workflow")
 
 # 计数器

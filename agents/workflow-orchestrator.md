@@ -48,7 +48,7 @@ color: purple
 
 ```bash
 # 1. 获取当前最新序号
-LAST_NUM=$(ls -1d /mnt/d/software/beilv-agent/.claude/sessions/[0-9]* 2>/dev/null | \
+LAST_NUM=$(ls -1d .claude/sessions/[0-9]* 2>/dev/null | \
   sed 's/.*\/\([0-9]\{3\}\)-.*/\1/' | sort -n | tail -1)
 
 # 2. 计算新序号（如果没有历史会话，从001开始）
@@ -78,10 +78,10 @@ echo "会话ID: $SESSION_ID"
 SESSION_ID="001-积分扣减系统-20260104-1600"  # 替换为实际值
 
 # 创建完整目录结构
-mkdir -p "/mnt/d/software/beilv-agent/.claude/sessions/${SESSION_ID}"/{analysis,planning,execution,workflow}
+mkdir -p ".claude/sessions/${SESSION_ID}"/{analysis,planning,execution,workflow}
 
 # 验证目录是否创建成功
-ls -la "/mnt/d/software/beilv-agent/.claude/sessions/${SESSION_ID}/"
+ls -la ".claude/sessions/${SESSION_ID}/"
 ```
 
 **验证要求**：必须看到以下4个目录：
@@ -206,7 +206,7 @@ Task(
   prompt=f"""
 **[会话信息]**
 - 会话ID: {session_id}
-- 会话目录: /mnt/d/software/beilv-agent/.claude/sessions/{session_id}/
+- 会话目录: .claude/sessions/{session_id}/
 
 **[项目信息]**
 - 项目路径: {project_path}
@@ -217,7 +217,7 @@ Task(
 
 **[任务要求]**
 请分析该项目并将分析报告保存到以下位置：
-/mnt/d/software/beilv-agent/.claude/sessions/{session_id}/analysis/{project_name}-analysis.md
+.claude/sessions/{session_id}/analysis/{project_name}-analysis.md
 
 **重要**：请使用上述指定的会话目录，不要创建新的会话目录。
   """
@@ -247,7 +247,7 @@ Task(
   prompt=f"""
 **[会话信息]**
 - 会话ID: {session_id}
-- 会话目录: /mnt/d/software/beilv-agent/.claude/sessions/{session_id}/
+- 会话目录: .claude/sessions/{session_id}/
 
 **[分析文件]**
 {列出所有已生成的分析报告路径}
@@ -257,7 +257,7 @@ Task(
 
 **[任务要求]**
 请汇总所有项目的分析报告，并将汇总结果保存到：
-/mnt/d/software/beilv-agent/.claude/sessions/{session_id}/analysis/summary.md
+.claude/sessions/{session_id}/analysis/summary.md
 
 **重要**：请使用上述指定的会话目录。
   """
@@ -370,7 +370,7 @@ Task(
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 会话目录：`.claude/sessions/{session-id}/`
 - 工作流状态文件：`.claude/sessions/{session-id}/workflow/session.md`
 - 项目信息文件：`{项目根目录}/project.info`

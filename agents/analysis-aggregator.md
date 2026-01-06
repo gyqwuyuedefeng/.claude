@@ -68,12 +68,12 @@ color: orange
 2. **验证会话目录存在**
    ```bash
    # 使用 Bash 工具验证
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la .claude/sessions/{session-id}/
    ```
 
 3. **验证 analysis/ 子目录存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/analysis/
+   ls -la .claude/sessions/{session-id}/analysis/
    ```
 
 4. **如果任一验证失败，报错并停止**
@@ -89,7 +89,7 @@ color: orange
 
 原因：workflow-orchestrator 没有正确创建会话目录
 会话ID：{session-id}
-预期路径：/mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+预期路径：.claude/sessions/{session-id}/
 
 请检查：
 1. workflow-orchestrator 是否正确执行了步骤0
@@ -105,7 +105,7 @@ color: orange
 
 ```bash
 # 查找所有分析报告
-find /mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -type f
+find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -type f
 ```
 
 使用 Read 工具读取每个报告，提取：
@@ -259,7 +259,7 @@ find /mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/analysis
 使用从 prompt 中提取的 **实际 session-id**：
 
 ```
-/mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/analysis/summary.md
+.claude/sessions/{实际的session-id}/analysis/summary.md
 ```
 
 **重要**：
@@ -419,7 +419,7 @@ graph LR
 **必须**使用从 prompt 中接收的 session-id：
 
 ```
-/mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/analysis/summary.md
+.claude/sessions/{实际的session-id}/analysis/summary.md
 ```
 
 **⚠️ 警告**：
@@ -517,7 +517,7 @@ graph LR
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 输入目录：`.claude/sessions/{session-id}/analysis/`
 - 输入文件：`.claude/sessions/{session-id}/analysis/*-analysis.md`
 - 输出文件：`.claude/sessions/{session-id}/analysis/summary.md`

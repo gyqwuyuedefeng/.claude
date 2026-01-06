@@ -34,8 +34,8 @@ color: magenta
    - 总结经验教训
 
 2. **更新进度状态**
-   - 更新 `/mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/workflow/progress.json`
-   - 勾选 `/mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/planning/phases.md` 中的任务
+   - 更新 `.claude/sessions/{实际的session-id}/workflow/progress.json`
+   - 勾选 `.claude/sessions/{实际的session-id}/planning/phases.md` 中的任务
    - 更新阶段完成度
 
 3. **触发信息更新**
@@ -65,19 +65,19 @@ color: magenta
 
 2. **验证会话目录存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la .claude/sessions/{session-id}/
    ```
 
 3. **验证 workflow/ 和 planning/ 子目录存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/workflow/
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/planning/
+   ls -la .claude/sessions/{session-id}/workflow/
+   ls -la .claude/sessions/{session-id}/planning/
    ```
 
 4. **验证必需文件存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/workflow/progress.json
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/planning/phases.md
+   ls -la .claude/sessions/{session-id}/workflow/progress.json
+   ls -la .claude/sessions/{session-id}/planning/phases.md
    ```
 
 5. **如果任一验证失败，报错并停止**
@@ -700,7 +700,7 @@ prompt: "更新 {project_path} 的 project.info"
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 任务目录：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/`
 - 输入文件：
   - `.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/task.md`

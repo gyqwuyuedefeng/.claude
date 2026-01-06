@@ -71,7 +71,7 @@ color: orange
 
 2. **验证会话目录存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la .claude/sessions/{session-id}/
    ```
 
 3. **验证任务目录存在**
@@ -749,7 +749,7 @@ logger.error("Database connection failed", exc_info=True)
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 任务目录：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/`
 - 输入文件：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/reports/task-report.md`
 - 输出文件：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/audit/audit-{timestamp}.md`

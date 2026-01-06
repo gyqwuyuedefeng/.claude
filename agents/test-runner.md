@@ -68,7 +68,7 @@ color: green
 
 2. **验证会话目录存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la .claude/sessions/{session-id}/
    ```
 
 3. **验证任务目录存在**
@@ -640,7 +640,7 @@ timeout 600 npm test
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 任务目录：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/`
 - 输出文件：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/reports/test-result.md`
 - 日志文件：`.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/reports/test-output.log`

@@ -18,7 +18,7 @@
 
 每个工作流**只有一个**会话目录：
 ```
-/mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+<项目根目录>/.claude/sessions/{session-id}/
 ```
 
 **格式规范**：
@@ -91,7 +91,7 @@ session-id 必须通过 **prompt 显式传递**：
 
 ```bash
 # 1. 获取当前最新序号
-LAST_NUM=$(ls -1d /mnt/d/software/beilv-agent/.claude/sessions/[0-9]* 2>/dev/null | \
+LAST_NUM=$(ls -1d <项目根目录>/.claude/sessions/[0-9]* 2>/dev/null | \
   sed 's/.*\/\([0-9]\{3\}\)-.*/\1/' | sort -n | tail -1)
 
 # 2. 计算新序号
@@ -116,10 +116,10 @@ echo "会话ID: $SESSION_ID"
 
 ```bash
 # 创建完整目录结构
-mkdir -p "/mnt/d/software/beilv-agent/.claude/sessions/${SESSION_ID}"/{analysis,planning,execution,workflow}
+mkdir -p "<项目根目录>/.claude/sessions/${SESSION_ID}"/{analysis,planning,execution,workflow}
 
 # 验证目录是否创建成功
-ls -la "/mnt/d/software/beilv-agent/.claude/sessions/${SESSION_ID}/"
+ls -la "<项目根目录>/.claude/sessions/${SESSION_ID}/"
 ```
 
 #### 3. 创建会话记录文件
@@ -132,7 +132,7 @@ ls -la "/mnt/d/software/beilv-agent/.claude/sessions/${SESSION_ID}/"
 ```markdown
 **[会话信息]**
 - 会话ID: {session_id}
-- 会话目录: /mnt/d/software/beilv-agent/.claude/sessions/{session_id}/
+- 会话目录: <项目根目录>/.claude/sessions/{session_id}/
 
 **[任务具体参数]**
 ... (根据子代理的需求提供)
@@ -153,10 +153,10 @@ Task(
   prompt=f"""
 **[会话信息]**
 - 会话ID: 001-积分扣减系统-20260104-1618
-- 会话目录: /mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统-20260104-1618/
+- 会话目录: <项目根目录>/.claude/sessions/001-积分扣减系统-20260104-1618/
 
 **[项目信息]**
-- 项目路径: /mnt/d/software/beilv-agent/mall/mall-portal
+- 项目路径: <项目根目录>/mall/mall-portal
 - 项目名称: mall-portal
 
 **[用户需求]**
@@ -164,7 +164,7 @@ Task(
 
 **[任务要求]**
 请分析该项目并将分析报告保存到以下位置：
-/mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统-20260104-1618/analysis/mall-portal-analysis.md
+<项目根目录>/.claude/sessions/001-积分扣减系统-20260104-1618/analysis/mall-portal-analysis.md
 
 **重要**：请使用上述指定的会话目录，不要创建新的会话目录。
   """
@@ -179,18 +179,18 @@ Task(
   prompt=f"""
 **[会话信息]**
 - 会话ID: 001-积分扣减系统-20260104-1618
-- 会话目录: /mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统-20260104-1618/
+- 会话目录: <项目根目录>/.claude/sessions/001-积分扣减系统-20260104-1618/
 
 **[分析文件]**
-- /mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统-20260104-1618/analysis/mall-portal-analysis.md
-- /mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统-20260104-1618/analysis/beilv-agent-analysis.md
+- <项目根目录>/.claude/sessions/001-积分扣减系统-20260104-1618/analysis/mall-portal-analysis.md
+- <项目根目录>/.claude/sessions/001-积分扣减系统-20260104-1618/analysis/beilv-agent-analysis.md
 
 **[用户需求]**
 实现积分扣减系统...
 
 **[任务要求]**
 请汇总所有项目的分析报告，并将汇总结果保存到：
-/mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统-20260104-1618/analysis/summary.md
+<项目根目录>/.claude/sessions/001-积分扣减系统-20260104-1618/analysis/summary.md
 
 **重要**：请使用上述指定的会话目录。
   """
@@ -238,12 +238,12 @@ Task(
 2. **验证会话目录存在**
    ```bash
    # 使用 Bash 工具验证
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la <项目根目录>/.claude/sessions/{session-id}/
    ```
 
 3. **验证相关子目录存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/{子目录}/
+   ls -la <项目根目录>/.claude/sessions/{session-id}/{子目录}/
    ```
    （根据代理职责验证 analysis/, planning/, execution/, 或 workflow/）
 
@@ -260,7 +260,7 @@ Task(
 
 原因：上级代理没有正确创建会话目录或传递 session-id
 会话ID：{session-id}
-预期路径：/mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+预期路径：<项目根目录>/.claude/sessions/{session-id}/
 
 请检查：
 1. workflow-orchestrator 是否正确执行了步骤0
@@ -285,7 +285,7 @@ file_path = f".claude/sessions/{{session-id}}/analysis/report.md"
 ```python
 # 从 prompt 中提取实际的 session-id
 session_id = "001-积分扣减系统-20260104-1618"  # 从 prompt 提取
-file_path = f"/mnt/d/software/beilv-agent/.claude/sessions/{session_id}/analysis/report.md"
+file_path = f"<项目根目录>/.claude/sessions/{session_id}/analysis/report.md"
 ```
 
 ### 输出规范章节
@@ -300,7 +300,7 @@ file_path = f"/mnt/d/software/beilv-agent/.claude/sessions/{session_id}/analysis
 **必须**使用从 prompt 中接收的 session-id：
 
 ```
-/mnt/d/software/beilv-agent/.claude/sessions/{实际的session-id}/{子目录}/{文件名}
+<项目根目录>/.claude/sessions/{实际的session-id}/{子目录}/{文件名}
 ```
 
 **⚠️ 警告**：
@@ -327,7 +327,7 @@ file_path = f"/mnt/d/software/beilv-agent/.claude/sessions/{session_id}/analysis
 1. 验证 session-id 格式是否正确
 2. 检查 workflow-orchestrator 的执行日志
 3. 手动验证目录是否存在：
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la <项目根目录>/.claude/sessions/{session-id}/
 4. 如果目录不存在，报错并终止流程
 ```
 
@@ -370,11 +370,11 @@ file_path = f"/mnt/d/software/beilv-agent/.claude/sessions/{session_id}/analysis
 
 ```bash
 # 列出所有会话目录
-ls -la /mnt/d/software/beilv-agent/.claude/sessions/
+ls -la <项目根目录>/.claude/sessions/
 
 # 检查特定会话的目录结构
 SESSION_ID="001-积分扣减系统-20260104-1618"
-tree /mnt/d/software/beilv-agent/.claude/sessions/$SESSION_ID/
+tree <项目根目录>/.claude/sessions/$SESSION_ID/
 ```
 
 **预期结果**：
@@ -395,7 +395,7 @@ tree /mnt/d/software/beilv-agent/.claude/sessions/$SESSION_ID/
 
 ```bash
 # 查找所有会话目录
-find /mnt/d/software/beilv-agent/.claude/sessions/ -maxdepth 1 -type d -name "[0-9]*"
+find <项目根目录>/.claude/sessions/ -maxdepth 1 -type d -name "[0-9]*"
 
 # 应该只有一个与当前工作流相关的会话目录
 ```

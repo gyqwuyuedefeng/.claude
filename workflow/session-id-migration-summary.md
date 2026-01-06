@@ -43,7 +43,7 @@ Task(
   prompt=f"""
 **[会话信息]**
 - 会话ID: {session_id}
-- 会话目录: /mnt/d/software/beilv-agent/.claude/sessions/{session_id}/
+- 会话目录: <项目根目录>/.claude/sessions/{session_id}/
 
 **[项目信息]**
 - 项目路径: {project_path}
@@ -54,7 +54,7 @@ Task(
 
 **[任务要求]**
 请分析该项目并将分析报告保存到以下位置：
-/mnt/d/software/beilv-agent/.claude/sessions/{session_id}/analysis/{project_name}-analysis.md
+<项目根目录>/.claude/sessions/{session_id}/analysis/{project_name}-analysis.md
 
 **重要**：请使用上述指定的会话目录，不要创建新的会话目录。
   """
@@ -97,7 +97,7 @@ Task(
 
 2. **验证会话目录存在**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la <项目根目录>/.claude/sessions/{session-id}/
    ```
 
 3. **验证相关子目录存在**
@@ -116,7 +116,7 @@ Task(
 
 原因：上级代理没有正确创建会话目录或传递 session-id
 会话ID：{session-id}
-预期路径：/mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+预期路径：<项目根目录>/.claude/sessions/{session-id}/
 
 请检查：
 1. workflow-orchestrator 是否正确执行了步骤0
@@ -210,7 +210,7 @@ Task(
 1. **创建测试会话**：
    ```bash
    SESSION_ID="999-测试会话-20260104-2000"
-   mkdir -p "/mnt/d/software/beilv-agent/.claude/sessions/$SESSION_ID"/{analysis,planning,execution,workflow}
+   mkdir -p "<项目根目录>/.claude/sessions/$SESSION_ID"/{analysis,planning,execution,workflow}
    ```
 
 2. **模拟调用两个 issue-analyzer**：
@@ -218,7 +218,7 @@ Task(
 
 3. **验证结果**：
    ```bash
-   ls -la "/mnt/d/software/beilv-agent/.claude/sessions/$SESSION_ID/analysis/"
+   ls -la "<项目根目录>/.claude/sessions/$SESSION_ID/analysis/"
    # 应该看到两个分析报告在同一个目录下：
    # - project1-analysis.md
    # - project2-analysis.md
@@ -228,7 +228,7 @@ Task(
 
 ```bash
 # 运行验证脚本（创建后）
-bash /mnt/d/software/beilv-agent/.claude/scripts/validate-session.sh
+bash <项目根目录>/.claude/scripts/validate-session.sh
 ```
 
 ## 预期效果
@@ -253,12 +253,12 @@ bash /mnt/d/software/beilv-agent/.claude/scripts/validate-session.sh
    CORRECT_SESSION="001-积分扣减系统-20260104-1618"
 
    # 将其他目录中的文件移动到正确目录
-   mv "/mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统分析/analysis/beilv-agent-analysis.md" \
-      "/mnt/d/software/beilv-agent/.claude/sessions/$CORRECT_SESSION/analysis/"
+   mv "<项目根目录>/.claude/sessions/001-积分扣减系统分析/analysis/beilv-agent-analysis.md" \
+      "<项目根目录>/.claude/sessions/$CORRECT_SESSION/analysis/"
 
    # 删除空的错误目录
-   rmdir "/mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统分析/analysis"
-   rmdir "/mnt/d/software/beilv-agent/.claude/sessions/001-积分扣减系统分析"
+   rmdir "<项目根目录>/.claude/sessions/001-积分扣减系统分析/analysis"
+   rmdir "<项目根目录>/.claude/sessions/001-积分扣减系统分析"
    ```
 
 2. **重新运行工作流**：

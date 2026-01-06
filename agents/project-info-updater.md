@@ -58,7 +58,7 @@ color: cyan
 
 2. **如果提供了会话信息，验证会话目录**
    ```bash
-   ls -la /mnt/d/software/beilv-agent/.claude/sessions/{session-id}/
+   ls -la .claude/sessions/{session-id}/
    ```
 
 3. **验证项目路径**
@@ -395,7 +395,7 @@ test -f {file_path}
 
 ## 参考
 
-- 工作目录：`/mnt/d/software/beilv-agent/`
+- 工作目录：`<项目根目录>/`
 - 输入文件：`{project_path}/project.info`
 - 输出文件：`{project_path}/project.info`, `{project_path}/info-update-log.md`
 - 备份文件：`{project_path}/project.info.bak`
