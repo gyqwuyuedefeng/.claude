@@ -95,8 +95,8 @@ TRIGGER_PATTERNS = {
 
 ```python
 PROJECT_KEYWORDS = [
-    "mall-portal",
-    "beilv-agent",
+    "{project-3}",
+    "{project-2}",
     "你的项目名",  # 添加这里
 ]
 ```

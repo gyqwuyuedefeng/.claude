@@ -123,9 +123,9 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 ```markdown
 | 项目 | 受影响模块 | 变更类型 | 影响其他项目 |
 |------|-----------|---------|-------------|
-| beilv-agent | 认证模块 | 新增接口 | mall-admin-web |
-| beilv-agent-web | 登录页面 | 修改UI | - |
-| mall-admin-web | 用户管理 | 调用新接口 | - |
+| {project-2} | 认证模块 | 新增接口 | {project-4} |
+| {project-1} | 登录页面 | 修改UI | - |
+| {project-4} | 用户管理 | 调用新接口 | - |
 ```
 
 ### 步骤3：分析跨项目依赖
@@ -134,11 +134,11 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 
 ```markdown
 **API 依赖**：
-- beilv-agent-web → beilv-agent (调用认证API)
-- mall-admin-web → mall-admin (调用用户管理API)
+- {project-1} → {project-2} (调用认证API)
+- {project-4} → {project-5} (调用用户管理API)
 
 **数据依赖**：
-- beilv-agent ← mall-portal (共享用户表)
+- {project-2} ← {project-3} (共享用户表)
 
 **配置依赖**：
 - 所有前端项目 → 统一的 API 网关配置
@@ -154,7 +154,7 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 ### 功能需求
 
 #### F1: 用户认证功能
-- **涉及项目**：beilv-agent, beilv-agent-web
+- **涉及项目**：{project-2}, {project-1}
 - **核心功能**：
   - 用户注册
   - 用户登录
@@ -162,7 +162,7 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 - **优先级**：P0
 
 #### F2: 用户资料管理
-- **涉及项目**：beilv-agent, beilv-agent-web, mall-admin-web
+- **涉及项目**：{project-2}, {project-1}, {project-4}
 - **核心功能**：
   - 查看资料
   - 编辑资料
@@ -181,15 +181,15 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 
 | 项目 | 新增文件 | 修改文件 | 删除文件 | 涉及模块 |
 |------|---------|---------|---------|---------|
-| beilv-agent | 5 | 3 | 0 | 2 |
-| beilv-agent-web | 8 | 5 | 1 | 3 |
-| mall-admin-web | 2 | 2 | 0 | 1 |
+| {project-2} | 5 | 3 | 0 | 2 |
+| {project-1} | 8 | 5 | 1 | 3 |
+| {project-4} | 2 | 2 | 0 | 1 |
 | **总计** | **15** | **10** | **1** | **6** |
 
 ### 复杂度评估
 
 - **整体复杂度**：中等
-- **最复杂项目**：beilv-agent-web（涉及3个模块，8个新文件）
+- **最复杂项目**：{project-1}（涉及3个模块，8个新文件）
 - **关键路径**：认证模块 → 前端登录页面
 ```
 
@@ -204,8 +204,8 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 
 | 风险点 | 涉及项目 | 严重性 | 缓解措施 |
 |--------|---------|--------|----------|
-| API 版本兼容性 | beilv-agent, beilv-agent-web, mall-admin-web | 高 | 使用版本号，渐进式发布 |
-| 数据库并发冲突 | beilv-agent, mall-portal | 中 | 使用事务，添加锁机制 |
+| API 版本兼容性 | {project-2}, {project-1}, {project-4} | 高 | 使用版本号，渐进式发布 |
+| 数据库并发冲突 | {project-2}, {project-3} | 中 | 使用事务，添加锁机制 |
 
 ### 跨项目风险
 
@@ -231,7 +231,7 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 
 1. **认证方案选择**
    - 问题：使用 JWT 还是 Session？
-   - 影响项目：beilv-agent, beilv-agent-web
+   - 影响项目：{project-2}, {project-1}
    - 建议：JWT（前后端分离，扩展性好）
 
 2. **API 版本策略**
@@ -243,11 +243,11 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 
 1. **项目依赖顺序**
    - 问题：哪个项目应该先开发？
-   - 建议：beilv-agent → beilv-agent-web → mall-admin-web
+   - 建议：{project-2} → {project-1} → {project-4}
 
 2. **数据库变更时机**
    - 问题：何时执行数据库迁移？
-   - 建议：在 beilv-agent 部署前执行
+   - 建议：在 {project-2} 部署前执行
 ```
 
 ### 步骤8：生成汇总报告
@@ -303,8 +303,8 @@ find .claude/sessions/{实际的session-id}/analysis/ -name "*-analysis.md" -typ
 
 ```mermaid
 graph LR
-    A[beilv-agent-web] -->|调用API| B[beilv-agent]
-    C[mall-admin-web] -->|调用API| D[mall-admin]
+    A[{project-1}] -->|调用API| B[{project-2}]
+    C[{project-4}] -->|调用API| D[{project-5}]
     B -->|共享数据| E[(用户数据库)]
     D -->|共享数据| E
 ```
@@ -334,19 +334,19 @@ graph LR
 ### 项目开发顺序
 
 1. **阶段1：后端基础**
-   - 项目：beilv-agent
+   - 项目：{project-2}
    - 任务：实现认证 API、数据库设计
    - 依赖：无
    - 交付物：可用的认证 API
 
 2. **阶段2：前端集成**
-   - 项目：beilv-agent-web
+   - 项目：{project-1}
    - 任务：实现登录页面、集成认证 API
    - 依赖：阶段1
    - 交付物：可用的用户认证流程
 
 3. **阶段3：管理后台**
-   - 项目：mall-admin-web
+   - 项目：{project-4}
    - 任务：集成新的用户管理功能
    - 依赖：阶段1
    - 交付物：完整的用户管理功能

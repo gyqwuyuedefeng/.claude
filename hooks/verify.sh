@@ -114,7 +114,7 @@ test_hook "检测引用.plan/文件" \
     "引用了 .plan/ 目录中的文件"
 
 test_hook "检测多项目需求" \
-    "echo '{\"user_prompt\":\"在 mall-portal 和 beilv-agent 中实现功能\"}' | python3 '$ENFORCER' prompt_check" \
+    "echo '{\"user_prompt\":\"在 project-a 和 project-b 中实现功能\"}' | python3 '$ENFORCER' prompt_check" \
     "涉及 2 个项目"
 
 test_hook "检测复杂任务特征" \

@@ -11,8 +11,6 @@
 ├── .gitignore                      # Git忽略规则
 ├── USAGE.md                        # 本文件 - 使用说明
 ├── CLAUDE.md                       # ✅ 通用工作指南
-├── PROJECT.md                      # ❌ 项目特定配置（不纳入版本控制）
-├── PROJECT.md.template             # ✅ 项目配置模板
 ├── README.md                       # ✅ 多代理框架详细文档
 ├── agents/                         # ✅ 子代理定义（12个）
 │   ├── workflow-orchestrator.md
@@ -54,73 +52,37 @@ cp -r /path/to/beilv-agent/.claude /path/to/new-project/
 # 2. 进入新项目的 .claude 目录
 cd /path/to/new-project/.claude
 
-# 3. 复制模板创建项目配置
-cp PROJECT.md.template PROJECT.md
-
-# 4. 编辑 PROJECT.md 填写项目信息
-vim PROJECT.md  # 或使用其他编辑器
-
-# 5. 完成！
+# 3. 完成！框架已可用
 ```
 
 ### 方法2：选择性复制
 
 ```bash
 # 只复制需要的文件
-cp /path/to/beilv-agent/.claude/CLAUDE.md /path/to/new-project/.claude/
-cp /path/to/beilv-agent/.claude/README.md /path/to/new-project/.claude/
-cp -r /path/to/beilv-agent/.claude/agents /path/to/new-project/.claude/
-cp -r /path/to/beilv-agent/.claude/workflow /path/to/new-project/.claude/
-cp /path/to/beilv-agent/.claude/PROJECT.md.template /path/to/new-project/.claude/
+cp /path/to/source-project/.claude/CLAUDE.md /path/to/new-project/.claude/
+cp /path/to/source-project/.claude/README.md /path/to/new-project/.claude/
+cp -r /path/to/source-project/.claude/agents /path/to/new-project/.claude/
+cp -r /path/to/source-project/.claude/workflow /path/to/new-project/.claude/
 
-# 创建项目配置
-cd /path/to/new-project/.claude
-cp PROJECT.md.template PROJECT.md
-vim PROJECT.md
+# 完成！
 ```
-
-## 📝 配置 PROJECT.md
-
-`PROJECT.md` 是唯一需要根据项目修改的文件。它包含：
-
-1. **环境说明** - 开发环境特点和限制
-2. **项目信息** - 项目名称、类型、技术栈
-3. **项目架构** - 目录结构和子项目
-4. **编码规范** - 项目特定的代码规范
-5. **技术文档** - 相关文档引用
-6. **项目约定** - 命名规范、端口分配等
-
-参考 `PROJECT.md.template` 中的说明和示例进行填写。
 
 ## 🔧 版本控制配置
 
-### 在原项目中（beilv-agent）
+### 提交到版本控制
 
-**不要提交** `PROJECT.md` 到版本控制：
-- ✅ `PROJECT.md` 已在 `.gitignore` 中
-- ✅ 提交 `PROJECT.md.template` 作为模板
-- ✅ 提交所有其他通用文件
+建议将整个 `.claude` 目录提交到版本控制：
 
-### 在新项目中
-
-根据需求决定：
-
-**选项1：不提交项目配置**（推荐给开源项目）
 ```bash
-# 保留 .gitignore，让每个开发者创建自己的 PROJECT.md
+# 添加并提交 .claude 目录
 git add .claude/
-# PROJECT.md 会被自动忽略
+git commit -m "feat: 添加 Claude Code 多代理框架"
 ```
 
-**选项2：提交项目配置**（推荐给团队项目）
-```bash
-# 修改 .gitignore，移除 PROJECT.md
-sed -i '/PROJECT.md/d' .claude/.gitignore
-
-# 然后提交所有文件
-git add .claude/
-git commit -m "feat: 添加 Claude Code 多代理框架配置"
-```
+**注意事项**：
+- ✅ 所有通用文件都应提交
+- ✅ sessions/ 目录会被自动忽略（运行时生成）
+- ✅ 框架的配置在 `.claude/.gitignore` 中已正确设置
 
 ## 📚 文档说明
 
@@ -133,11 +95,6 @@ git commit -m "feat: 添加 Claude Code 多代理框架配置"
 - 多代理协同系统的详细说明
 - 包含架构图、工作流程、使用示例
 - **不需要修改**，作为参考文档
-
-### PROJECT.md - 项目配置
-- **唯一需要修改**的文件
-- 包含项目特定的信息和规范
-- 使用 `PROJECT.md.template` 作为起点
 
 ### agents/ - 子代理定义
 - 12个专职子代理的定义
@@ -156,53 +113,30 @@ git commit -m "feat: 添加 Claude Code 多代理框架配置"
    cp -r .claude /path/to/new-project/
    ```
 
-2. **创建项目配置**
-   ```bash
-   cd /path/to/new-project/.claude
-   cp PROJECT.md.template PROJECT.md
-   ```
-
-3. **编辑项目信息**
-   ```bash
-   # 修改 PROJECT.md：
-   # - 项目名称
-   # - 项目架构
-   # - 编码规范
-   # - 技术文档引用
-   ```
-
-4. **开始使用**
+2. **开始使用**
    - Claude Code 启动时会自动加载 `CLAUDE.md`
-   - `CLAUDE.md` 会通过 `@PROJECT.md` 引用你的项目配置
+   - 建议在项目根目录的 `CLAUDE.md` 中添加项目特定配置
    - 所有规范和配置即刻生效！
 
 ## ❓ 常见问题
 
 ### Q: 如何更新框架到最新版本？
 
-A: 复制通用文件到你的项目，**不要覆盖** `PROJECT.md`：
+A: 复制通用文件到你的项目：
 ```bash
 cp /path/to/latest/.claude/CLAUDE.md .claude/
 cp /path/to/latest/.claude/README.md .claude/
 cp -r /path/to/latest/.claude/agents .claude/
 cp -r /path/to/latest/.claude/workflow .claude/
-# 保留你的 PROJECT.md 不变
 ```
 
 ### Q: 可以自定义子代理吗？
 
 A: 可以！在 `agents/` 目录下添加你的自定义代理定义文件即可。
 
-### Q: `PROJECT.md` 应该提交到版本控制吗？
+### Q: 如何添加项目特定配置？
 
-A: 取决于你的场景：
-- **团队项目**：提交，让团队统一配置
-- **开源项目**：不提交，让贡献者自定义
-- **个人项目**：随意
-
-### Q: 如何禁用某些规则？
-
-A: 直接编辑你的 `PROJECT.md`，添加项目特定的规则覆盖。
+A: 在你的项目根目录的 `CLAUDE.md` 中添加项目信息、编码规范等配置。
 
 ## 📖 更多信息
 

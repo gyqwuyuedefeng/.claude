@@ -171,7 +171,7 @@ color: purple
 
 #### Task 1.1: 数据库设计
 - **描述**：设计用户认证相关的数据表
-- **涉及项目**：beilv-agent
+- **涉及项目**：{project-2}
 - **输入**：需求分析报告
 - **输出**：数据库迁移脚本
 - **验收标准**：
@@ -181,7 +181,7 @@ color: purple
 
 #### Task 1.2: 基础 API 框架
 - **描述**：搭建认证 API 的基础框架
-- **涉及项目**：beilv-agent
+- **涉及项目**：{project-2}
 - **输入**：数据库迁移脚本
 - **输出**：可运行的 API 框架
 - **验收标准**：
@@ -285,8 +285,8 @@ color: purple
 
 | 项目名称 | 路径 | 变更规模 | 关键模块 |
 |---------|------|---------|---------|
-| beilv-agent | /path/to/project | 中等（8个文件） | 认证模块 |
-| beilv-agent-web | /path/to/project | 大型（13个文件） | 登录、用户管理 |
+| {project-2} | /path/to/project | 中等（8个文件） | 认证模块 |
+| {project-1} | /path/to/project | 大型（13个文件） | 登录、用户管理 |
 
 ## 阶段划分
 
@@ -371,9 +371,9 @@ color: purple
 - 生产环境准备（如需要）
 
 ### 发布顺序
-1. beilv-agent 后端服务
-2. beilv-agent-web 前端应用
-3. mall-admin-web 管理后台更新
+1. {project-2} 后端服务
+2. {project-1} 前端应用
+3. {project-4} 管理后台更新
 
 ### 回滚策略
 - 数据库迁移可回滚

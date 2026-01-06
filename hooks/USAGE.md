@@ -119,15 +119,15 @@ Hooks 会在下次启动 Claude Code 会话时自动生效。无需手动操作�
 #### 3. 多项目需求
 
 涉及 **2个或以上** 子项目：
-- mall-portal
-- beilv-agent
-- mall-admin-web
-- mall-admin
+- {project-3}
+- {project-2}
+- {project-4}
+- {project-5}
 
 **示例**：
 ```
-✅ "在 mall-portal 和 beilv-agent 中实现XXX"
-✅ "修改 mall-admin-web 前端和 mall-admin 后端"
+✅ "在 {project-3} 和 {project-2} 中实现XXX"
+✅ "修改 {project-4} 前端和 {project-5} 后端"
 ```
 
 #### 4. 复杂任务特征
@@ -227,7 +227,7 @@ Task(
 实现积分扣减系统，参考 .plan/106-积分扣减系统设计与实现/plan.md
 
 ## 涉及项目
-beilv-agent, mall-portal
+{project-2}, {project-3}
 """
 )
 ```
@@ -287,8 +287,8 @@ TRIGGER_PATTERNS = {
 ```python
 # 多项目关键词
 PROJECT_KEYWORDS = [
-    "mall-portal",
-    "beilv-agent",
+    "{project-3}",
+    "{project-2}",
     # 添加你的项目名称
 ]
 ```

@@ -50,7 +50,7 @@ python3 .claude/hooks/workflow_enforcer.py session_start
 
 2. **引用计划文件**：用户输入包含 `.plan/`
 
-3. **多项目需求**：涉及 2 个或以上子项目（mall-portal, beilv-agent, mall-admin-web, mall-admin）
+3. **多项目需求**：涉及 2 个或以上子项目（{project-3}, {project-2}, {project-4}, {project-5}）
 
 4. **复杂任务特征**：
    - 数据库设计/表结构
@@ -188,7 +188,7 @@ Task(
 实现积分扣减系统，参考 .plan/106-积分扣减系统设计与实现/plan.md
 
 ## 涉及项目
-beilv-agent, mall-portal
+{project-2}, {project-3}
 """
 )
 ```
@@ -308,7 +308,7 @@ Hooks 只能提供**提醒和反馈**，不能强制 Claude 必须调用 workflo
 
 ## 与参考项目的对比
 
-| 特性 | 参考项目 (mall) | 本项目 (beilv-agent) |
+| 特性 | 参考项目 (mall) | 本项目 ({project-2}) |
 |------|----------------|---------------------|
 | Hook 管理工具 | claude-autonomous | workflow_enforcer.py |
 | SessionStart | 注入协议 | 注入核心约束 |

@@ -154,7 +154,7 @@ class HooksVerifier:
         self.test_hook(
             "检测多项目需求",
             ["prompt_check"],
-            input_data={"user_prompt": "在 mall-portal 和 beilv-agent 中实现功能"},
+            input_data={"user_prompt": "在 project-a 和 project-b 中实现功能"},
             expected="涉及 2 个项目"
         )
 

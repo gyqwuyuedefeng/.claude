@@ -143,7 +143,7 @@ graph TD
 
 ## 与参考项目的对比
 
-| 特性 | 参考项目 (mall) | 本项目 (beilv-agent) | 说明 |
+| 特性 | 参考项目 (mall) | 本项目 ({project-2}) | 说明 |
 |------|----------------|---------------------|------|
 | Hook 管理 | claude-autonomous (第三方工具) | workflow_enforcer.py (内置) | 本项目使用 Python 脚本，无需额外工具 |
 | SessionStart | 注入协议 | 注入核心约束 | ✅ 已实现 |

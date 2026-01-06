@@ -21,7 +21,7 @@
 
 - **完全可移植** - 可直接拷贝到任意项目
 - **零硬编码** - 所有路径使用相对路径或动态获取
-- **简单配置** - 只需修改 `PROJECT.md` 即可使用
+- **无需配置** - 即拷即用，项目特定配置在项目根目录的 CLAUDE.md 中添加
 - **跨平台兼容** - 支持 Windows、Linux、macOS
 
 ---
@@ -37,32 +37,13 @@
 cp -r /path/to/current-project/.claude /path/to/new-project/
 ```
 
-### 步骤2：配置项目信息
+### 步骤2：开始使用
 
-进入新项目，修改 `PROJECT.md` 文件：
-
-```bash
-cd /path/to/new-project
-```
-
-**方式A：从模板创建**（推荐）
-```bash
-cp .claude/PROJECT.md.template .claude/PROJECT.md
-# 然后编辑 .claude/PROJECT.md
-```
-
-**方式B：直接修改现有文件**
-```bash
-# 编辑 .claude/PROJECT.md，修改以下内容：
-# - 项目名称
-# - 项目类型
-# - 技术栈
-# - 项目架构
-# - 目录结构
-# - 编码规范
-# - 数据库表前缀（如适用）
-# - 端口分配（如适用）
-```
+框架已可直接使用！建议在项目根目录的 `CLAUDE.md` 中添加项目特定配置：
+- 项目名称和架构
+- 技术栈说明
+- 编码规范
+- 目录结构
 
 ### 步骤3：验证配置
 
@@ -81,7 +62,6 @@ ls -la .claude/
 ├── sessions/        # 会话目录（运行时生成）
 ├── workflow/        # 工作流模板
 ├── CLAUDE.md        # 工作指南（通用）
-├── PROJECT.md       # 项目配置（需修改）
 ├── README.md        # 框架说明（通用）
 └── .gitignore       # Git忽略规则
 ```
@@ -110,8 +90,7 @@ ls -la .claude/
 | `sessions/` | 会话目录（运行时生成） | ❌ 不需要 |
 | `CLAUDE.md` | 通用工作指南 | ❌ 不需要 |
 | `README.md` | 框架说明文档 | ❌ 不需要 |
-| `PROJECT.md` | **项目特定配置** | ✅ **必须修改** |
-| `.gitignore` | Git忽略规则 | ⚠️ 可选修改 |
+| `.gitignore` | Git忽略规则 | ❌ 不需要 |
 
 ### 运行时生成的目录
 
@@ -130,59 +109,11 @@ ls -la .claude/
 
 ## ⚙️ 配置说明
 
-### PROJECT.md 配置项
-
-`PROJECT.md` 是**唯一需要修改**的文件，包含以下配置项：
-
-#### 1. 基本信息
-```markdown
-**项目名称**：[你的项目名称]
-**项目类型**：[单体应用 / 微服务 / Monorepo / 前后端分离]
-**技术栈**：[主要技术栈]
-```
-
-#### 2. 项目架构
-```markdown
-项目根目录: [项目根目录路径]
-
-子项目/模块路径：
-├── [模块1名称]: [路径]
-├── [模块2名称]: [路径]
-└── [模块3名称]: [路径]
-```
-
-#### 3. 编码规范
-```markdown
-### Python 代码规范
-- 格式化工具：[工具名称]
-- 代码风格：[风格指南]
-...
-
-### TypeScript/React 代码规范
-...
-```
-
-#### 4. 项目特定约定
-```markdown
-### 数据库表前缀（如适用）
-- `user_*`: 用户管理
-- `order_*`: 订单管理
-...
-
-### 端口分配（如适用）
-- 前端: 3000
-- 后端: 8080
-...
-```
-
 ### .gitignore 配置
 
 `.claude/.gitignore` 默认排除以下内容：
 
 ```gitignore
-# 项目特定配置（不纳入版本控制）
-PROJECT.md
-
 # 所有工作流会话（运行时生成）
 sessions/
 !sessions/README.md
@@ -257,27 +188,8 @@ cp -r /path/to/source/.claude /path/to/nodejs-project/
 # 2. 进入新项目
 cd /path/to/nodejs-project
 
-# 3. 创建 PROJECT.md
-cp .claude/PROJECT.md.template .claude/PROJECT.md
-
-# 4. 编辑 PROJECT.md
-nano .claude/PROJECT.md
-```
-
-**PROJECT.md 配置示例**：
-```markdown
-**项目名称**：My Node.js App
-**项目类型**：单体应用
-**技术栈**：Node.js + Express + MongoDB
-
-## 项目架构
-项目根目录: /path/to/nodejs-project
-
-主要目录：
-├── src/          # 源代码
-├── tests/        # 测试文件
-├── config/       # 配置文件
-└── public/       # 静态资源
+# 3. 开始使用
+# 框架已可用！建议在项目根目录的 CLAUDE.md 中添加项目特定配置
 ```
 
 ### 示例2：拷贝到 Python 项目
@@ -289,20 +201,8 @@ cp -r /path/to/source/.claude /path/to/python-project/
 # 2. 进入新项目
 cd /path/to/python-project
 
-# 3. 修改 PROJECT.md
-```
-
-**PROJECT.md 配置示例**：
-```markdown
-**项目名称**：My Python API
-**项目类型**：微服务
-**技术栈**：Python + FastAPI + PostgreSQL
-
-## 编码规范
-### Python 代码规范
-- 使用 Black 格式化（88字符行宽）
-- 使用 isort 管理导入
-- 遵循 PEP 8 规范
+# 3. 开始使用
+# 框架已可用！
 ```
 
 ### 示例3：拷贝到 Monorepo 项目
@@ -311,24 +211,11 @@ cd /path/to/python-project
 # 1. 拷贝 .claude 目录
 cp -r /path/to/source/.claude /path/to/monorepo/
 
-# 2. 修改 PROJECT.md
+# 2. 开始使用
+# 框架已可用！
 ```
 
-**PROJECT.md 配置示例**：
-```markdown
-**项目名称**：My Monorepo
-**项目类型**：Monorepo
-**技术栈**：TypeScript + React + Node.js
-
-## 项目架构
-项目根目录: /path/to/monorepo
-
-子项目路径：
-├── packages/frontend: packages/frontend
-├── packages/backend: packages/backend
-├── packages/shared: packages/shared
-└── packages/mobile: packages/mobile
-```
+---
 
 ---
 
@@ -364,24 +251,18 @@ chmod +x .claude/hooks/*.py
 
 **解决方案**：
 ```bash
-# 验证是否有硬编码路径
-grep -r "/mnt/d/software/beilv-agent" .claude/agents/
+# 验证是否有硬编码路径（替换为你的项目路径）
+grep -r "/path/to/your-project" .claude/agents/
 
 # 如果有结果，说明是旧版本，需要重新拷贝最新版本
 ```
 
-### Q4: PROJECT.md 应该纳入版本控制吗？
-
-**建议**：
-- **团队项目**：纳入版本控制（删除 `.claude/.gitignore` 中的 `PROJECT.md` 规则）
-- **个人项目**：不纳入版本控制（保持默认配置）
-
-### Q5: 如何验证改造是否成功？
+### Q4: 如何验证改造是否成功？
 
 **验证方法**：
 ```bash
-# 1. 检查是否有硬编码路径
-grep -r "/mnt/d/software/beilv-agent" .claude/
+# 1. 检查是否有硬编码路径（替换为你的项目路径）
+grep -r "/path/to/your-project" .claude/
 
 # 2. 如果没有输出，说明改造成功
 # 3. 如果有输出，说明还有硬编码路径需要修复
@@ -409,7 +290,6 @@ grep -r "/mnt/d/software/beilv-agent" .claude/
 
 - **框架说明**：`.claude/README.md`
 - **工作指南**：`.claude/CLAUDE.md`
-- **项目配置模板**：`.claude/PROJECT.md.template`
 
 ---
 

@@ -45,13 +45,11 @@ class WorkflowEnforcer:
         ],
     }
 
-    # 多项目关键词
+    # 多项目关键词（用户需要在此配置自己的项目列表）
+    # 示例：PROJECT_KEYWORDS = ["frontend", "backend", "api"]
+    # 留空则禁用多项目检测
     PROJECT_KEYWORDS = [
-        "beilv-agent-web",
-        "beilv-agent",
-        "mall-portal",
-        "mall-admin-web",
-        "mall-admin"
+        # TODO: 在此配置你的项目名称列表
     ]
 
     # 复杂任务特征
