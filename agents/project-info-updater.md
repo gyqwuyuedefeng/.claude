@@ -183,7 +183,7 @@ fi
 
 ```bash
 # 使用 tree 命令重新生成目录结构（自动过滤运行时生成的文件和目录）
-tree -L 4 \
+tree \
   -I 'node_modules|.git|dist|build|target|out|bin|obj|__pycache__|*.pyc|.venv|venv|env|.env.*|.idea|.vscode|.vs|coverage|.nyc_output|logs|tmp|temp|uploads|downloads|cache|.cache|.next|.nuxt|.output|.vercel|.turbo|*.log|*.lock|package-lock.json|yarn.lock|pnpm-lock.yaml|Cargo.lock|Gemfile.lock|composer.lock|poetry.lock|.DS_Store|Thumbs.db|vendor|bower_components|.pytest_cache|.mypy_cache|.ruff_cache|.eslintcache|htmlcov|.coverage|.eclipse|*.swp|*.swo|static/uploads|media' \
   --dirsfirst \
   {project_path}
@@ -215,7 +215,7 @@ tree -L 4 \
 
 ```bash
 # 使用 find 和格式化（需要同样的过滤规则）
-find {project_path} -maxdepth 4 \
+find {project_path} \
   -not -path "*/node_modules/*" \
   -not -path "*/.git/*" \
   -not -path "*/dist/*" \
@@ -548,7 +548,7 @@ project.info 文件不存在，建议调用 project-info-builder 重新生成。
 系统没有 tree 命令，使用备用方案（find 命令）。
 
 备用命令：
-find {project_path} -maxdepth 4 \
+find {project_path} \
   -not -path "*/node_modules/*" \
   -not -path "*/.git/*" \
   | sort
@@ -565,7 +565,7 @@ find {project_path} -maxdepth 4 \
 cp {project_path}/project.info {project_path}/project.info.backup-$(date +%Y%m%d-%H%M%S)
 
 # 2. 重新生成树状结构
-tree -L 4 -I 'node_modules|.git|dist|build|__pycache__' {project_path}
+tree -I 'node_modules|.git|dist|build|__pycache__' {project_path}
 
 # 3. 统计文件数量
 find {project_path} -type f | wc -l

@@ -134,7 +134,7 @@ python3 project_analyzer.py --project-path /path/to/project
 
 ```bash
 # 使用 tree 命令 + LLM 推断
-tree -L 4 -I 'node_modules|.git|dist|build|__pycache__' /path/to/project
+tree -I 'node_modules|.git|dist|build|__pycache__' /path/to/project
 # 生成 < 10KB 的 Markdown 树状结构
 ```
 

@@ -13,7 +13,7 @@ color: green
 1. **生成树状结构**
    - 使用 `tree` 命令快速生成目录树
    - 过滤无关目录（node_modules、.git、dist 等）
-   - 控制展示层级（通常 3-5 层）
+   - 展示所有层级（不限制深度）
 
 2. **添加智能注释**
    - **文件夹级别**：基于目录名推断职责（如 "api" → "API 接口层"）
@@ -59,14 +59,13 @@ fi
 
 ```bash
 # 生成树状结构（自动过滤无关目录和运行时生成的文件）
-tree -L 4 \
+tree \
   -I 'node_modules|.git|dist|build|target|out|bin|obj|__pycache__|*.pyc|.venv|venv|env|.env.*|.idea|.vscode|.vs|coverage|.nyc_output|logs|tmp|temp|uploads|downloads|cache|.cache|.next|.nuxt|.output|.vercel|.turbo|*.log|*.lock|package-lock.json|yarn.lock|pnpm-lock.yaml|Cargo.lock|Gemfile.lock|composer.lock|poetry.lock|.DS_Store|Thumbs.db|vendor|bower_components|.pytest_cache|.mypy_cache|.ruff_cache|.eslintcache|htmlcov|.coverage|.eclipse|*.swp|*.swo|static/uploads|media' \
   --dirsfirst \
   {project_path}
 ```
 
 **参数说明**：
-- `-L 4`：显示 4 层目录（可根据项目大小调整 3-5）
 - `-I 'pattern'`：排除运行时生成的目录和文件（详见"目录过滤规则"部分）
 - `--dirsfirst`：目录优先显示
 
@@ -80,7 +79,7 @@ tree -L 4 \
 
 ```bash
 # 使用 find 和格式化（需要同样的过滤规则）
-find {project_path} -maxdepth 4 \
+find {project_path} \
   -not -path "*/node_modules/*" \
   -not -path "*/.git/*" \
   -not -path "*/dist/*" \
@@ -646,7 +645,7 @@ fi
 sudo apt-get install tree
 
 # 或使用 find 命令替代
-find {project_path} -maxdepth 4 \
+find {project_path} \
   -not -path "*/node_modules/*" \
   -not -path "*/.git/*" \
   -not -path "*/dist/*" \
@@ -656,7 +655,6 @@ find {project_path} -maxdepth 4 \
 
 ### 项目过大
 
-- 如果目录层级很深，减少 `-L` 参数（如 `-L 3`）
 - 对于大型项目，聚焦核心目录（如只扫描 `app/`, `src/`）
 
 ### 权限问题
@@ -672,7 +670,7 @@ find {project_path} -maxdepth 4 \
 
 ```bash
 # 1. 生成目录树
-tree -L 4 -I 'node_modules|.git|dist|build|__pycache__' {project_path}
+tree -I 'node_modules|.git|dist|build|__pycache__' {project_path}
 
 # 2. 统计文件数量
 find {project_path} -type f | wc -l
