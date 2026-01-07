@@ -4,9 +4,9 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh",
-            "timeout": 10
+            "type": "prompt",
+            "prompt": "你正在启动一个新的 Claude Code 会话。\n\n## 输入信息\n\n$ARGUMENTS\n\n## 任务\n\n请检查是否存在进行中的工作流会话：\n\n1. 分析最近的对话历史，查找工作流标记：\n   - \"workflow-orchestrator\" 调用\n   - session-id 或会话目录路径\n   - 工作流阶段（init/analysis/planning/execution/completed）\n\n2. 如果检测到进行中的工作流：\n   - 提取 session-id\n   - 识别当前阶段\n   - 评估哪些步骤已完成\n\n3. 生成上下文注入消息：\n   - 警告标题\n   - 会话信息（session-id, 阶段）\n   - 必须遵守的约束（4条）\n   - 当前阶段的下一步行动\n\n4. 如果没有进行中的工作流：\n   - 不输出任何内容\n\n## 阶段行动指导模板\n\n- **init**: \"你需要调用 workflow-orchestrator 开始分析阶段\"\n- **analysis**: \"你需要完成所有项目的分析并调用 analysis-aggregator 汇总\"\n- **planning**: \"你需要调用 master-planner 制定计划并等待用户确认\"\n- **execution**: \"你需要继续执行任务，完成代码实现、测试和审计\"\n- **completed**: \"工作流已完成，你可以向用户报告结果\"\n\n## 输出格式\n\n如果有进行中的工作流，输出格式化的上下文消息：\n\n```\n⚠️ **工作流状态恢复** ⚠️\n\n检测到进行中的工作流会话：{session-id}\n\n当前阶段：{stage}\n\n**必须遵守的约束**：\n1. 你必须继续执行该工作流，不能重新开始\n2. 你必须使用已存在的会话目录\n3. 你必须严格按照阶段执行\n4. 你必须在继续前验证所有前置条件已满足\n\n**下一步行动**：\n{阶段指导}\n```\n\n如果没有工作流，请返回空输出。",
+            "timeout": 30
           }
         ]
       }
@@ -27,9 +27,9 @@
         "matcher": "Write",
         "hooks": [
           {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate-write.py",
-            "timeout": 5
+            "type": "prompt",
+            "prompt": "你正在评估一个文件写入操作。\n\n## 输入信息\n\n$ARGUMENTS\n\n## 任务\n\n请检查写入路径是否合规：\n\n1. 提取写入路径（tool_input.file_path）\n\n2. 检查路径是否包含 `.claude/sessions/`\n\n3. 如果包含：\n   - 提取路径中的会话ID（格式：数字-描述-时间戳）\n   - 从对话历史中查找最新的活跃会话ID\n   - 比较两个ID是否一致\n\n4. 决策规则：\n   - 路径不包含 `.claude/sessions/` → 允许写入\n   - 路径中的会话ID是最新会话 → 允许写入\n   - 路径中的会话ID不是最新会话 → 拒绝写入\n\n## 输出格式\n\n**允许写入**：\n```json\n{\n  \"decision\": \"approve\",\n  \"reason\": \"写入路径合规\"\n}\n```\n\n**拒绝写入**：\n```json\n{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"错误：正在尝试写入旧会话目录 {旧会话ID}，当前活跃会话为 {新会话ID}。这会导致数据不一致。\"\n  }\n}\n```\n\n请严格按照上述逻辑判断。",
+            "timeout": 10
           }
         ]
       }

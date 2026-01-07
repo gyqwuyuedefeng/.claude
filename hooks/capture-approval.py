@@ -7,18 +7,46 @@ import sys
 import re
 from pathlib import Path
 
+def is_plan_approval(user_input: str) -> bool:
+    """
+    判断用户输入是否为计划批准
+    使用更复杂的匹配逻辑，避免误判
+    """
+    # 明确的批准短语（高置信度）
+    explicit_approvals = [
+        "批准", "批准计划", "确认计划", "同意计划",
+        "approve", "approve the plan", "confirmed", "confirm the plan"
+    ]
+
+    for phrase in explicit_approvals:
+        if phrase in user_input:
+            return True
+
+    # 模糊匹配（中等置信度）- 需要同时包含批准词和计划关键词
+    approval_words = ["同意", "yes", "ok", "继续", "确认"]
+    plan_keywords = ["计划", "plan", "方案"]
+
+    has_approval = any(word in user_input for word in approval_words)
+    has_plan_keyword = any(keyword in user_input for keyword in plan_keywords)
+
+    if has_approval and has_plan_keyword:
+        return True
+
+    return False
+
 def main():
     try:
         input_data = json.load(sys.stdin)
     except json.JSONDecodeError:
         sys.exit(1)
 
-    prompt = input_data.get("prompt", "").lower()
+    prompt = input_data.get("prompt", "")
+    prompt_lower = prompt.lower().strip()
 
-    # 检测批准关键词
-    approval_keywords = ["批准", "确认", "同意", "approve", "yes", "ok", "继续"]
+    # 判断是否为计划批准
+    is_approval = is_plan_approval(prompt_lower)
 
-    if any(keyword in prompt for keyword in approval_keywords):
+    if is_approval:
         # 查找最新会话
         sessions_dir = Path(".claude/sessions")
         if sessions_dir.exists():
