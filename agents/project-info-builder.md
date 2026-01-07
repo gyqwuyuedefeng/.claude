@@ -58,31 +58,49 @@ fi
 **核心命令**：
 
 ```bash
-# 生成树状结构（自动过滤无关目录）
+# 生成树状结构（自动过滤无关目录和运行时生成的文件）
 tree -L 4 \
-  -I 'node_modules|.git|dist|build|target|__pycache__|*.pyc|.venv|venv|.idea|.vscode|coverage|logs|tmp|temp|uploads|static|.next|.nuxt' \
+  -I 'node_modules|.git|dist|build|target|out|bin|obj|__pycache__|*.pyc|.venv|venv|env|.env.*|.idea|.vscode|.vs|coverage|.nyc_output|logs|tmp|temp|uploads|downloads|cache|.cache|.next|.nuxt|.output|.vercel|.turbo|*.log|*.lock|package-lock.json|yarn.lock|pnpm-lock.yaml|Cargo.lock|Gemfile.lock|composer.lock|poetry.lock|.DS_Store|Thumbs.db|vendor|bower_components|.pytest_cache|.mypy_cache|.ruff_cache|.eslintcache|htmlcov|.coverage|.eclipse|*.swp|*.swo|static/uploads|media' \
   --dirsfirst \
-  --filesfirst \
   {project_path}
 ```
 
 **参数说明**：
 - `-L 4`：显示 4 层目录（可根据项目大小调整 3-5）
-- `-I 'pattern'`：排除无关目录（node_modules、.git 等）
+- `-I 'pattern'`：排除运行时生成的目录和文件（详见"目录过滤规则"部分）
 - `--dirsfirst`：目录优先显示
-- `--filesfirst`：文件在目录后显示（可选）
+
+**⚠️ 重要提示**：
+- **优先读取 .gitignore 文件**，将其中的模式合并到 -I 参数中
+- **跳过所有编译产物**：Java 的 target/，前端的 dist/build/，.NET 的 bin/obj/
+- **跳过所有依赖包**：node_modules/，Python 的 .venv/venv/，PHP 的 vendor/
+- **跳过所有缓存**：__pycache__/，.cache/，.pytest_cache/ 等
 
 **备用命令**（如果没有 tree）：
 
 ```bash
-# 使用 find 和格式化
+# 使用 find 和格式化（需要同样的过滤规则）
 find {project_path} -maxdepth 4 \
   -not -path "*/node_modules/*" \
   -not -path "*/.git/*" \
   -not -path "*/dist/*" \
   -not -path "*/build/*" \
+  -not -path "*/target/*" \
+  -not -path "*/out/*" \
+  -not -path "*/bin/*" \
+  -not -path "*/obj/*" \
   -not -path "*/__pycache__/*" \
   -not -path "*/.venv/*" \
+  -not -path "*/venv/*" \
+  -not -path "*/env/*" \
+  -not -path "*/.cache/*" \
+  -not -path "*/cache/*" \
+  -not -path "*/.next/*" \
+  -not -path "*/.nuxt/*" \
+  -not -path "*/vendor/*" \
+  -not -path "*/logs/*" \
+  -not -path "*/tmp/*" \
+  -not -path "*/temp/*" \
   | sort | sed 's|[^/]*/| |g'
 ```
 
@@ -504,27 +522,106 @@ if dir_name == 'routes' and file_name.endswith('.py'):
 
 ## 目录过滤规则
 
-### 始终跳过的目录
+### ⚠️ 重要原则：跳过运行时生成的文件和目录
+
+**核心规则**：
+- ✅ 扫描源代码、配置文件、文档
+- ❌ 跳过编译产物、依赖包、缓存、日志等运行时生成的文件
+- ❌ 跳过 `.gitignore` 中列出的所有文件和目录
+
+**目的**：
+1. 避免扫描无关文件，减少 token 消耗
+2. 保持 project.info 文件轻量（< 10KB）
+3. 聚焦于源代码结构，而非构建产物
+
+### 始终跳过的目录和文件
 
 ```bash
 # 在 tree 命令中使用 -I 参数
--I 'node_modules|.git|dist|build|target|__pycache__|*.pyc|.venv|venv|.idea|.vscode|coverage|logs|tmp|temp|uploads|.next|.nuxt'
+-I 'node_modules|.git|dist|build|target|out|bin|obj|__pycache__|*.pyc|.venv|venv|env|.env.*|.idea|.vscode|.vs|coverage|.nyc_output|logs|tmp|temp|uploads|downloads|cache|.cache|.next|.nuxt|.output|.vercel|.turbo|*.log|*.lock|package-lock.json|yarn.lock|pnpm-lock.yaml|Cargo.lock|Gemfile.lock|composer.lock|poetry.lock|.DS_Store|Thumbs.db'
 ```
 
 **详细列表**：
-- `node_modules/` - Node.js 依赖
-- `.git/` - Git 版本控制
-- `dist/`, `build/` - 构建输出
-- `target/` - Java 构建输出
-- `__pycache__/`, `*.pyc` - Python 缓存
-- `.venv/`, `venv/` - Python 虚拟环境
-- `.idea/`, `.vscode/` - IDE 配置
-- `coverage/` - 测试覆盖率报告
-- `logs/` - 日志文件
+
+#### 依赖包目录（编译/运行时生成）
+- `node_modules/` - Node.js/JavaScript 依赖包
+- `.venv/`, `venv/`, `env/` - Python 虚拟环境
+- `vendor/` - PHP/Go/Ruby 依赖包
+- `bower_components/` - Bower 依赖（旧项目）
+
+#### 编译产物目录（运行时生成）
+- `dist/`, `build/`, `out/` - 前端构建输出
+- `target/` - Java/Maven 构建输出
+- `bin/`, `obj/` - .NET/C# 构建输出
+- `.next/`, `.nuxt/`, `.output/` - Next.js/Nuxt.js 构建缓存
+- `.vercel/`, `.turbo/` - 部署平台缓存
+
+#### 缓存目录（运行时生成）
+- `__pycache__/`, `*.pyc`, `*.pyo` - Python 字节码缓存
+- `.cache/`, `cache/` - 通用缓存目录
+- `.pytest_cache/` - Pytest 缓存
+- `.mypy_cache/` - MyPy 类型检查缓存
+- `.ruff_cache/` - Ruff linter 缓存
+- `.eslintcache` - ESLint 缓存
+
+#### 测试覆盖率报告（运行时生成）
+- `coverage/`, `htmlcov/`, `.coverage` - Python 覆盖率报告
+- `.nyc_output/` - JavaScript 覆盖率报告
+
+#### IDE 和编辑器配置
+- `.idea/` - IntelliJ IDEA
+- `.vscode/` - Visual Studio Code
+- `.vs/` - Visual Studio
+- `.eclipse/` - Eclipse
+- `*.swp`, `*.swo` - Vim 临时文件
+
+#### 日志和临时文件（运行时生成）
+- `logs/`, `*.log` - 日志文件
 - `tmp/`, `temp/` - 临时文件
-- `uploads/` - 上传文件
-- `.next/` - Next.js 缓存
-- `.nuxt/` - Nuxt.js 缓存
+- `.DS_Store` - macOS 文件系统元数据
+- `Thumbs.db` - Windows 缩略图缓存
+
+#### 用户上传文件（运行时生成）
+- `uploads/`, `downloads/` - 用户上传/下载文件
+- `static/uploads/` - 静态文件上传目录
+- `media/` - 媒体文件目录
+
+#### 锁文件（自动生成，通常被 .gitignore）
+- `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml` - JavaScript 锁文件
+- `Cargo.lock` - Rust 锁文件
+- `Gemfile.lock` - Ruby 锁文件
+- `composer.lock` - PHP 锁文件
+- `poetry.lock` - Python Poetry 锁文件
+
+#### 版本控制
+- `.git/`, `.svn/`, `.hg/` - 版本控制元数据
+
+#### 环境变量文件（可能包含敏感信息）
+- `.env`, `.env.*` - 环境变量配置（应该跳过，不扫描）
+
+### 🔍 参考 .gitignore 文件
+
+在生成 project.info 之前，应该：
+1. **读取项目根目录的 `.gitignore` 文件**（如果存在）
+2. **提取其中列出的目录和文件模式**
+3. **将这些模式添加到 tree 命令的 -I 参数中**
+
+**示例**：
+```bash
+# 读取 .gitignore
+if [ -f "{project_path}/.gitignore" ]; then
+    # 提取目录模式（去除注释和空行）
+    IGNORE_PATTERNS=$(grep -v '^#' {project_path}/.gitignore | grep -v '^$' | tr '\n' '|' | sed 's/|$//')
+
+    # 合并到 tree 命令的 -I 参数
+    tree -L 4 -I "$IGNORE_PATTERNS|node_modules|.git|dist|..." {project_path}
+fi
+```
+
+**注意**：
+- .gitignore 中的模式可能需要转换为 tree 命令的格式
+- 如果 .gitignore 中有 `*.log`，tree 的 -I 参数已支持这种通配符
+- 优先使用 .gitignore，再补充常见的运行时目录
 
 ## 质量检查清单
 

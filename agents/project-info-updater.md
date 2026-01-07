@@ -182,17 +182,62 @@ fi
 **核心命令**：
 
 ```bash
-# 使用 tree 命令重新生成目录结构
+# 使用 tree 命令重新生成目录结构（自动过滤运行时生成的文件和目录）
 tree -L 4 \
-  -I 'node_modules|.git|dist|build|target|__pycache__|*.pyc|.venv|venv|.idea|.vscode|coverage|logs|tmp|temp|uploads|.next|.nuxt' \
+  -I 'node_modules|.git|dist|build|target|out|bin|obj|__pycache__|*.pyc|.venv|venv|env|.env.*|.idea|.vscode|.vs|coverage|.nyc_output|logs|tmp|temp|uploads|downloads|cache|.cache|.next|.nuxt|.output|.vercel|.turbo|*.log|*.lock|package-lock.json|yarn.lock|pnpm-lock.yaml|Cargo.lock|Gemfile.lock|composer.lock|poetry.lock|.DS_Store|Thumbs.db|vendor|bower_components|.pytest_cache|.mypy_cache|.ruff_cache|.eslintcache|htmlcov|.coverage|.eclipse|*.swp|*.swo|static/uploads|media' \
   --dirsfirst \
   {project_path}
 ```
+
+**⚠️ 重要原则：跳过运行时生成的文件和目录**
+
+**核心规则**：
+- ✅ 扫描源代码、配置文件、文档
+- ❌ 跳过编译产物、依赖包、缓存、日志等运行时生成的文件
+- ❌ 跳过 `.gitignore` 中列出的所有文件和目录
+
+**过滤的主要类别**：
+1. **依赖包目录**：node_modules/, .venv/, venv/, vendor/
+2. **编译产物**：dist/, build/, target/, out/, bin/, obj/
+3. **缓存目录**：__pycache__/, .cache/, .pytest_cache/, .mypy_cache/
+4. **日志和临时文件**：logs/, tmp/, temp/, *.log
+5. **IDE 配置**：.idea/, .vscode/, .vs/
+6. **版本控制**：.git/, .svn/, .hg/
+7. **锁文件**：package-lock.json, yarn.lock, Cargo.lock 等
 
 **说明**：
 - 不需要"增量更新"，直接重新生成即可
 - tree 命令非常快速（通常 < 1秒）
 - 生成的结构会自动反映最新的文件系统状态
+- **优先读取 .gitignore 文件**，将其中的模式合并到 -I 参数中
+
+**备用命令**（如果没有 tree）：
+
+```bash
+# 使用 find 和格式化（需要同样的过滤规则）
+find {project_path} -maxdepth 4 \
+  -not -path "*/node_modules/*" \
+  -not -path "*/.git/*" \
+  -not -path "*/dist/*" \
+  -not -path "*/build/*" \
+  -not -path "*/target/*" \
+  -not -path "*/out/*" \
+  -not -path "*/bin/*" \
+  -not -path "*/obj/*" \
+  -not -path "*/__pycache__/*" \
+  -not -path "*/.venv/*" \
+  -not -path "*/venv/*" \
+  -not -path "*/env/*" \
+  -not -path "*/.cache/*" \
+  -not -path "*/cache/*" \
+  -not -path "*/.next/*" \
+  -not -path "*/.nuxt/*" \
+  -not -path "*/vendor/*" \
+  -not -path "*/logs/*" \
+  -not -path "*/tmp/*" \
+  -not -path "*/temp/*" \
+  | sort
+```
 
 ### 步骤4：重新推断目录和文件职责
 
