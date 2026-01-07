@@ -64,70 +64,130 @@
 
 ## 整体调用流程
 
-### 流程示意图
+### 核心流程概览（简化版）
+
+以下流程图展示了工作流的5大核心阶段，便于快速理解整体架构：
+
+```mermaid
+graph LR
+    Start([用户需求]) --> Stage1[🔍 阶段1<br/>需求分析]
+    Stage1 --> Stage2[📋 阶段2<br/>计划制定]
+    Stage2 --> UserConfirm{👤 用户<br/>确认?}
+    UserConfirm -->|❌ 拒绝| End1([流程终止])
+    UserConfirm -->|✅ 批准| Stage3[💻 阶段3<br/>代码实现]
+    Stage3 --> Stage4[✅ 阶段4<br/>质量保证]
+    Stage4 --> Stage5[📊 阶段5<br/>总结迭代]
+    Stage5 --> CheckNext{还有<br/>任务?}
+    CheckNext -->|是| Stage3
+    CheckNext -->|否| End([✨ 完成])
+
+    style Start fill:#90caf9,stroke:#333,stroke-width:2px
+    style Stage1 fill:#e1bee7,stroke:#333,stroke-width:2px
+    style Stage2 fill:#bbdefb,stroke:#333,stroke-width:2px
+    style Stage3 fill:#ffcdd2,stroke:#333,stroke-width:2px
+    style Stage4 fill:#fff9c4,stroke:#333,stroke-width:2px
+    style Stage5 fill:#c5e1a5,stroke:#333,stroke-width:2px
+    style UserConfirm fill:#ffe0b2,stroke:#333,stroke-width:3px
+    style End fill:#a5d6a7,stroke:#333,stroke-width:2px
+    style End1 fill:#ef9a9a,stroke:#333,stroke-width:2px
+```
+
+**5大阶段说明**：
+1. **🔍 需求分析**：创建会话 → 检查项目信息 → 多项目并行分析 → 汇总结果
+2. **📋 计划制定**：制定整体计划 → **用户确认**（必须） → 拆分任务 → 初始化进度
+3. **💻 代码实现**：读取任务 → 实现代码 → 运行测试 → 生成报告
+4. **✅ 质量保证**：代码审计 → 自动修复/人工介入 → 重新审计
+5. **📊 总结迭代**：总结成果 → 更新进度 → 准备下一任务 → 更新项目信息
+
+---
+
+### 详细流程图（完整版）
+
+以下流程图展示了所有子代理的调用关系和详细逻辑：
 
 ```mermaid
 graph TB
-    Start([用户提出编码需求]) --> WO[workflow-orchestrator<br/>工作流编排]
+    Start([👤 用户提出编码需求]) --> WO[workflow-orchestrator<br/>🎯 工作流编排]
 
-    WO --> CheckInfo{检查 project.info}
-    CheckInfo -->|缺失| PIB[project-info-builder<br/>构建项目信息]
-    CheckInfo -->|存在| IA[issue-analyzer<br/>问题分析]
-    PIB --> IA
+    WO --> CreateSession[📁 步骤0: 创建工作流会话<br/>生成session-id<br/>创建目录结构<br/>初始化session.md]
+    CreateSession --> CheckInfo{检查 project.info}
+
+    CheckInfo -->|❌ 缺失| PIB[project-info-builder<br/>📦 构建项目信息]
+    CheckInfo -->|✅ 存在| IA
+    PIB --> IA[issue-analyzer<br/>🔍 问题分析]
 
     IA --> IA1[分析项目1]
     IA --> IA2[分析项目2]
-    IA --> IAN[分析项目N]
+    IA --> IAN[分析项目N...]
 
-    IA1 --> AA[analysis-aggregator<br/>分析汇总]
+    IA1 --> AA[analysis-aggregator<br/>📊 分析汇总]
     IA2 --> AA
     IAN --> AA
 
-    AA --> MP[master-planner<br/>总体计划制定]
+    AA --> DecideWorkflow{需要完整<br/>工作流?}
+    DecideWorkflow -->|❌ 否<br/>简单需求| SimpleExec[直接执行简单修改]
+    DecideWorkflow -->|✅ 是<br/>复杂需求| MP[master-planner<br/>📋 总体计划制定]
 
-    MP --> UserConfirm{用户确认计划?}
-    UserConfirm -->|修改| MP
-    UserConfirm -->|批准| PS[plan-splitter<br/>计划拆分]
-    UserConfirm -->|拒绝| End1([流程终止])
+    MP --> UserConfirm{👤 用户确认计划?}
+    UserConfirm -->|🔄 修改| MP
+    UserConfirm -->|❌ 拒绝| End1([❌ 流程终止])
+    UserConfirm -->|✅ 批准| PS[plan-splitter<br/>✂️ 计划拆分]
 
-    PS --> TaskQueue[任务队列<br/>Phase → Task]
+    PS --> InitProgress[初始化 progress.json<br/>创建任务目录结构]
+    InitProgress --> TaskLoop
 
-    TaskQueue --> CE[code-executor<br/>代码执行]
+    subgraph TaskLoop["🔄 任务执行循环（串行）"]
+        CE[code-executor<br/>💻 代码执行] --> TR[test-runner<br/>🧪 测试运行]
 
-    CE --> TR[test-runner<br/>测试运行]
+        TR --> TestResult{测试通过?}
+        TestResult -->|❌ 失败| FixCode[修复代码]
+        FixCode --> CE
+        TestResult -->|✅ 通过| CA[code-auditor<br/>🔍 代码审计]
 
-    TR --> TestResult{测试通过?}
-    TestResult -->|失败| CE
-    TestResult -->|通过| CA[code-auditor<br/>代码审计]
+        CA --> AuditResult{审计通过?}
+        AuditResult -->|❌ 失败<br/>可自动修复| AF[auto-fixer<br/>🔧 自动修复]
+        AuditResult -->|❌ 失败<br/>需人工| Manual[👤 人工介入修复]
+        AuditResult -->|✅ 通过| TS[task-summarizer<br/>📝 任务总结]
 
-    CA --> AuditResult{审计通过?}
-    AuditResult -->|失败,可修复| AF[auto-fixer<br/>自动修复]
-    AuditResult -->|失败,需人工| Manual[人工介入修复]
-    AuditResult -->|通过| TS[task-summarizer<br/>任务总结]
+        AF --> ReAudit[重新审计]
+        ReAudit --> CA
+        Manual --> CA
 
-    AF --> CA
-    Manual --> CA
+        TS --> UpdateProgress[更新 progress.json]
+    end
 
-    TS --> UpdateProgress[更新进度]
-    UpdateProgress --> CheckQueue{还有任务?}
+    TaskLoop --> CheckQueue{还有任务?}
+    CheckQueue -->|✅ 是| TaskLoop
+    CheckQueue -->|❌ 否| FinalCheck{有结构性<br/>变更?}
 
-    CheckQueue -->|是| TaskQueue
-    CheckQueue -->|否| PIU[project-info-updater<br/>更新项目信息]
+    FinalCheck -->|✅ 是| PIU[project-info-updater<br/>🔄 更新项目信息]
+    FinalCheck -->|❌ 否| End
+    PIU --> End([✨ 工作流完成])
 
-    PIU --> End([工作流完成])
+    SimpleExec --> End
 
-    style WO fill:#e1bee7
-    style MP fill:#e1bee7
-    style PS fill:#bbdefb
-    style CE fill:#ffcdd2
-    style TR fill:#fff9c4
-    style CA fill:#fff9c4
-    style AF fill:#f8bbd0
-    style TS fill:#c5e1a5
-    style Start fill:#90caf9
-    style End fill:#a5d6a7
-    style End1 fill:#ef9a9a
+    style Start fill:#90caf9,stroke:#333,stroke-width:3px
+    style WO fill:#e1bee7,stroke:#333,stroke-width:2px
+    style CreateSession fill:#fce4ec,stroke:#333,stroke-width:2px
+    style MP fill:#e1bee7,stroke:#333,stroke-width:2px
+    style PS fill:#bbdefb,stroke:#333,stroke-width:2px
+    style CE fill:#ffcdd2,stroke:#333,stroke-width:2px
+    style TR fill:#fff9c4,stroke:#333,stroke-width:2px
+    style CA fill:#fff9c4,stroke:#333,stroke-width:2px
+    style AF fill:#f8bbd0,stroke:#333,stroke-width:2px
+    style TS fill:#c5e1a5,stroke:#333,stroke-width:2px
+    style UserConfirm fill:#ffe0b2,stroke:#f57c00,stroke-width:4px
+    style End fill:#a5d6a7,stroke:#333,stroke-width:3px
+    style End1 fill:#ef9a9a,stroke:#333,stroke-width:3px
+    style TaskLoop fill:#f5f5f5,stroke:#666,stroke-width:2px
 ```
+
+**关键节点说明**：
+- **🎯 workflow-orchestrator**：入口代理，负责整体编排
+- **👤 用户确认**：master-planner 阶段必须等待用户批准
+- **🔄 任务执行循环**：串行执行，每个任务都经过 实现→测试→审计→总结
+- **🔧 失败恢复**：测试失败重新实现，审计失败自动修复或人工介入
+- **✨ 结构性变更**：有变更时触发 project-info-updater
 
 ### 详细流程说明
 
