@@ -2,25 +2,11 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/workflow_enforcer.py session_start",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-
-    "UserPromptSubmit": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/workflow_enforcer.py prompt_check",
-            "timeout": 5
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh",
+            "timeout": 10
           }
         ]
       }
@@ -28,11 +14,21 @@
 
     "PreToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Task",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/workflow_enforcer.py tool_gate",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate-subagent.py",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate-write.py",
             "timeout": 5
           }
         ]
@@ -41,13 +37,34 @@
 
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Task",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/sync-all-state.py",
-            "timeout": 10,
-            "description": "同步所有状态文件（监听 progress.json 写入）"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/update-progress.py",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/track-file.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/capture-approval.py",
+            "timeout": 5
           }
         ]
       }
@@ -55,13 +72,11 @@
 
     "SubagentStop": [
       {
-        "matcher": "*",
         "hooks": [
           {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/verify-and-fix-state.py",
-            "timeout": 10,
-            "description": "验证并修复状态一致性"
+            "type": "prompt",
+            "prompt": "你正在评估子代理是否应该停止。\n\n输入信息：$ARGUMENTS\n\n请分析对话历史，确认：\n1. 该子代理的职责是什么？\n2. 是否生成了必需的产物文件？\n3. 产物内容是否完整？\n4. 是否有错误需要处理？\n\n如果所有职责都已完成，返回 {\"decision\": \"approve\", \"reason\": \"任务已完成\"}。\n如果有未完成的任务，返回 {\"decision\": \"block\", \"reason\": \"详细说明缺少什么\"}。",
+            "timeout": 30
           }
         ]
       }
@@ -69,12 +84,11 @@
 
     "Stop": [
       {
-        "matcher": "*",
         "hooks": [
           {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/workflow_enforcer.py response_check",
-            "timeout": 5
+            "type": "prompt",
+            "prompt": "你正在评估主代理是否应该停止。\n\n当前状态：$ARGUMENTS\n\n请检查：\n1. 是否有进行中的工作流？（.claude/sessions/ 目录）\n2. progress.json 中的 workflow_stage 和 checklist\n3. 是否还有待执行的任务？\n\n判断标准：\n- workflow_stage = 'completed' 且 all_tasks_completed = true → {\"decision\": \"approve\"}\n- 工作流未完成 → {\"decision\": \"block\", \"reason\": \"列出待办事项\"}\n- 无工作流 → {\"decision\": \"approve\"}",
+            "timeout": 30
           }
         ]
       }
