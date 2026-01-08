@@ -36,6 +36,20 @@ def validate_subagent_call(tool_input, progress):
     stage = progress.get("workflow_stage", "")
     checklist = progress.get("checklist", {})
 
+    # 定义终态：允许在这些状态下启动新会话
+    TERMINAL_STAGES = [
+        "completed",                      # 正常完成
+        "failed",                         # 失败
+        "testing_completed_with_issues",  # 测试完成但有问题
+        "cancelled",                      # 用户取消
+        ""                                # 空字符串表示未初始化
+    ]
+
+    # 特殊处理：允许在终态下启动新的 workflow-orchestrator
+    # 这样用户可以在上一个会话完成后启动全新的独立会话
+    if subagent_type == "workflow-orchestrator" and stage in TERMINAL_STAGES:
+        return True, None
+
     # 定义阶段-子代理映射
     STAGE_AGENTS = {
         "init": ["workflow-orchestrator"],
@@ -48,7 +62,7 @@ def validate_subagent_call(tool_input, progress):
     allowed_agents = STAGE_AGENTS.get(stage, [])
 
     if subagent_type not in allowed_agents:
-        return False, f"当前阶段 '{stage}' 不允许调用 '{subagent_type}' 子代理。允许的子代理：{', '.join(allowed_agents)}"
+        return False, f"当前阶段 '{stage}' 不允许调用 '{subagent_type}' 子代理。允许的子代理：{', '.join(allowed_agents) if allowed_agents else '无'}\n\n提示：如果您想开启新会话，请等待当前会话完成。"
 
     # 检查前置条件
     if subagent_type == "analysis-aggregator":
