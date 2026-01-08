@@ -32,3 +32,5 @@ Thumbs.db
 *.sublime-*
 
 **/__pycache__/*
+
+archives/*
