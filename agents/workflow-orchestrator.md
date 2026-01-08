@@ -1,7 +1,7 @@
 ---
 name: workflow-orchestrator
 description: 工作流编排代理，负责解析用户需求、检查项目信息、调度后续子代理，管理整个编码需求流程的入口和协调工作
-tools: Read, Grep, Glob, Task
+tools: Read, Grep, Glob, Bash, Task
 model: inherit
 color: purple
 ---
