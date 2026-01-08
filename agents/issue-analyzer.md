@@ -1,7 +1,7 @@
 ---
 name: issue-analyzer
 description: 问题分析代理，针对单个项目深度分析用户需求，定位关键模块、文件和函数，评估潜在影响和风险
-tools: Read, Grep, Glob, Write, Task
+tools: Read, Grep, Glob, Bash, Task
 model: inherit
 color: yellow
 ---

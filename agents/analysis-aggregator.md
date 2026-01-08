@@ -1,7 +1,7 @@
 ---
 name: analysis-aggregator
 description: 分析汇总代理，汇总多个 issue-analyzer 的报告，整合跨项目依赖，产出统一的分析摘要供计划阶段使用
-tools: Read, Write
+tools: Read, Bash
 model: inherit
 color: orange
 ---

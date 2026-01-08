@@ -1,7 +1,7 @@
 ---
 name: code-auditor
 description: 代码审计代理，对任务级代码进行质量审计，检查代码规范、安全性、性能等问题，输出问题列表及严重性评级
-tools: Read, Grep, Bash, Write
+tools: Read, Grep, Bash
 model: inherit
 color: orange
 ---

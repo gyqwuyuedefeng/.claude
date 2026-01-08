@@ -1,7 +1,7 @@
 ---
 name: test-runner
 description: 测试运行代理，针对单个任务运行限定范围的测试（单元/集成/E2E等），生成详细的测试报告
-tools: Bash, Read, Write
+tools: Bash, Read
 model: inherit
 color: green
 ---

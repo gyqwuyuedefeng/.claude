@@ -1,7 +1,7 @@
 ---
 name: task-summarizer
 description: 任务总结代理，任务完成后进行总结、更新计划进度、触发project-info更新（如有结构性变更）、准备下一任务
-tools: Read, Write, Task
+tools: Read, Bash, Task
 model: inherit
 color: magenta
 ---

@@ -1,7 +1,7 @@
 ---
 name: master-planner
 description: 总体计划制定代理，根据汇总分析创建整体实施计划，列出阶段、目标、风险点，需要用户确认后才能继续
-tools: Read, Write
+tools: Read, Bash
 model: inherit
 color: purple
 ---

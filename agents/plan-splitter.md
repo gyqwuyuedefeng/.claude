@@ -1,7 +1,7 @@
 ---
 name: plan-splitter
 description: 计划拆分代理,在整体计划获批后按阶段拆分子任务并生成标准化的目录结构和任务文件
-tools: Read, Write, Bash
+tools: Read, Bash
 model: inherit
 color: blue
 ---
