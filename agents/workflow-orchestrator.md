@@ -44,51 +44,117 @@ color: purple
 
 #### 0.1 生成会话ID
 
-使用 Bash 工具执行以下命令：
+**⚠️ 必须使用 Bash 工具执行以下完整脚本（一次性执行所有步骤）：**
 
 ```bash
-# 1. 获取当前最新序号
-LAST_NUM=$(ls -1d .claude/sessions/[0-9]* 2>/dev/null | \
-  sed 's/.*\/\([0-9]\{3\}\)-.*/\1/' | sort -n | tail -1)
+# 1. 确保在项目根目录执行（包含 .claude 目录）
+cd /mnt/d/software/beilv-agent || { echo "错误：无法切换到项目根目录"; exit 1; }
 
-# 2. 计算新序号（如果没有历史会话，从001开始）
+# 2. 确保 sessions 目录存在
+mkdir -p .claude/sessions
+
+# 3. 获取当前最新序号（查找所有以3位数字开头的会话目录）
+LAST_NUM=$(ls -1d .claude/sessions/[0-9][0-9][0-9]-* 2>/dev/null | \
+  sed 's/.*\/\([0-9][0-9][0-9]\)-.*/\1/' | \
+  sort -n | \
+  tail -1)
+
+# 4. 调试信息（显示找到的最大序号）
+echo "找到的最大序号: ${LAST_NUM:-无}"
+
+# 5. 计算新序号（如果没有历史会话，从001开始）
 if [ -z "$LAST_NUM" ]; then
   NEW_NUM="001"
+  echo "没有历史会话，使用初始序号: 001"
 else
+  # 使用 10# 前缀强制按十进制解析，避免 001 被当作八进制
   NEW_NUM=$(printf "%03d" $((10#$LAST_NUM + 1)))
+  echo "计算新序号: $LAST_NUM + 1 = $NEW_NUM"
 fi
 
-# 3. 生成时间戳
+# 6. 生成时间戳（格式：YYYYMMDD-HHMM）
 TIMESTAMP=$(date +%Y%m%d-%H%M)
 
-# 4. 从用户需求提取描述（需要你手动替换为实际描述）
-DESC="积分扣减系统"  # 根据实际需求修改
+# 7. 从用户需求提取描述（需要根据实际需求替换）
+# ⚠️ 重要：必须根据用户需求修改此描述，保持简短（3-8个汉字）
+DESC="示例需求描述"  # 【必须修改】根据实际需求设置，例如："积分扣减系统"、"用户认证"、"订单优化"
 
-# 5. 生成完整会话ID
+# 8. 生成完整会话ID
 SESSION_ID="${NEW_NUM}-${DESC}-${TIMESTAMP}"
-echo "会话ID: $SESSION_ID"
+
+# 9. 输出结果供后续步骤使用
+echo "=========================================="
+echo "会话ID生成成功："
+echo "  序号: $NEW_NUM"
+echo "  描述: $DESC"
+echo "  时间戳: $TIMESTAMP"
+echo "  完整会话ID: $SESSION_ID"
+echo "=========================================="
+echo "$SESSION_ID"  # 最后一行输出纯会话ID，方便提取
+```
+
+**执行要求**：
+1. **必须一次性执行上述完整脚本**，不要分步执行
+2. **必须在输出中看到序号递增**，例如从 001 递增到 002、003...
+3. **必须修改 DESC 变量**为实际需求描述
+4. **记录输出的 SESSION_ID**，后续步骤都要使用这个值
+
+**输出示例**：
+```
+找到的最大序号: 004
+计算新序号: 004 + 1 = 005
+==========================================
+会话ID生成成功：
+  序号: 005
+  描述: 用户认证功能
+  时间戳: 20260108-1430
+  完整会话ID: 005-用户认证功能-20260108-1430
+==========================================
+005-用户认证功能-20260108-1430
 ```
 
 #### 0.2 创建会话目录结构
 
-**强制使用 Bash 工具**执行以下命令：
+**⚠️ 必须使用 Bash 工具执行以下完整脚本（使用上一步的 SESSION_ID）：**
 
 ```bash
-# 使用上一步生成的 SESSION_ID
-SESSION_ID="001-积分扣减系统-20260104-1600"  # 替换为实际值
+# 1. 设置会话ID（从步骤0.1的输出中获取）
+# ⚠️ 重要：必须替换为步骤0.1输出的实际会话ID
+SESSION_ID="005-用户认证功能-20260108-1430"  # 【必须替换】从上一步输出中复制
 
-# 创建完整目录结构
+# 2. 确保在项目根目录执行
+cd /mnt/d/software/beilv-agent || { echo "错误：无法切换到项目根目录"; exit 1; }
+
+# 3. 创建完整目录结构（4个子目录）
+echo "正在创建会话目录: .claude/sessions/${SESSION_ID}/"
 mkdir -p ".claude/sessions/${SESSION_ID}"/{analysis,planning,execution,workflow}
 
-# 验证目录是否创建成功
-ls -la ".claude/sessions/${SESSION_ID}/"
+# 4. 验证目录创建结果
+echo "=========================================="
+echo "目录创建验证："
+if [ -d ".claude/sessions/${SESSION_ID}/analysis" ] && \
+   [ -d ".claude/sessions/${SESSION_ID}/planning" ] && \
+   [ -d ".claude/sessions/${SESSION_ID}/execution" ] && \
+   [ -d ".claude/sessions/${SESSION_ID}/workflow" ]; then
+  echo "✓ 所有4个子目录创建成功"
+  echo "=========================================="
+  ls -la ".claude/sessions/${SESSION_ID}/"
+  echo "=========================================="
+  echo "会话目录路径: .claude/sessions/${SESSION_ID}/"
+else
+  echo "✗ 目录创建失败，请检查权限和路径"
+  exit 1
+fi
 ```
 
-**验证要求**：必须看到以下4个目录：
-- `analysis/`
-- `planning/`
-- `execution/`
-- `workflow/`
+**验证要求**：
+1. **必须看到以下4个目录**：
+   - `analysis/`
+   - `planning/`
+   - `execution/`
+   - `workflow/`
+2. **输出必须包含"✓ 所有4个子目录创建成功"**
+3. **如果看到错误，必须停止流程并报告**
 
 #### 0.3 创建会话记录文件
 
