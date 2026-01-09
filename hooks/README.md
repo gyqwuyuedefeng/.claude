@@ -352,9 +352,26 @@ Hooks 只能提供**提醒和反馈**，不能强制 Claude 必须调用 workflo
 
 ### 配置文件: PROJECT.md
 
-**位置**: `/mnt/d/software/beilv-agent/mall/PROJECT.md`
+**位置**: `/mnt/d/software/beilv-agent/.claude/PROJECT.md` ✨ 已调整
 
 **格式**: YAML
+
+**说明**:
+- 配置文件位于 `.claude/` 目录，与框架配置统一
+- 提供 `PROJECT.example.md` 作为模板，方便迁移到其他项目
+- 建议将 `PROJECT.md` 加入 .gitignore（如果每个开发者路径不同）
+
+**快速开始**:
+```bash
+# 1. 复制模板
+cp .claude/PROJECT.example.md .claude/PROJECT.md
+
+# 2. 编辑配置
+# 修改 projects 列表中的项目路径、名称、主分支
+
+# 3. 验证格式
+python3 -c "import yaml; yaml.safe_load(open('.claude/PROJECT.md'))"
+```
 
 ### 分支命名规则
 

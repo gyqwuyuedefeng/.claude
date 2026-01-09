@@ -12,7 +12,7 @@ set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
-PROJECT_CONFIG="$PROJECT_ROOT/mall/PROJECT.md"
+PROJECT_CONFIG="$PROJECT_ROOT/.claude/PROJECT.md"
 SESSIONS_DIR="$PROJECT_ROOT/.claude/sessions"
 
 # 日志函数
