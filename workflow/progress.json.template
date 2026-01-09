@@ -1,11 +1,13 @@
 {
   "session_id": "workflow-template",
+  "workflow_stage": "init",
   "overall_plan": "plan/overall-plan.md",
   "phases_index": "plan/phases.md",
   "start_time": null,
   "current_phase": null,
   "current_task": null,
   "status": "initialized",
+  "checklist": {},
   "phases": [],
   "statistics": {
     "total_phases": 0,

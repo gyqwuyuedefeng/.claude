@@ -25,6 +25,27 @@ def load_progress():
     with open(progress_file) as f:
         return json.load(f)
 
+def infer_workflow_stage(progress):
+    """当 workflow_stage 缺失时，自动推断工作流阶段"""
+
+    # 规则1：有 phases 和 tasks → execution 阶段
+    if "phases" in progress and progress.get("phases"):
+        print("ℹ️  自动推断工作流阶段：execution（检测到phases和tasks）", file=sys.stderr)
+        return "execution"
+
+    # 规则2：有 overall_plan → planning 阶段
+    if "overall_plan" in progress:
+        print("ℹ️  自动推断工作流阶段：planning（检测到overall_plan）", file=sys.stderr)
+        return "planning"
+
+    # 规则3：有 session_id 但无其他内容 → init 阶段
+    if "session_id" in progress:
+        print("ℹ️  自动推断工作流阶段：init（仅有session_id）", file=sys.stderr)
+        return "init"
+
+    # 规则4：完全空白 → 允许启动新会话
+    return ""
+
 def validate_subagent_call(tool_input, progress):
     """验证子代理调用是否符合当前阶段"""
     if not progress:
@@ -35,6 +56,10 @@ def validate_subagent_call(tool_input, progress):
     subagent_type = tool_input.get("subagent_type", "")
     stage = progress.get("workflow_stage", "")
     checklist = progress.get("checklist", {})
+
+    # 【新增】当 stage 为空但 progress 有内容时，自动推断阶段
+    if not stage and progress:
+        stage = infer_workflow_stage(progress)
 
     # 定义终态：允许在这些状态下启动新会话
     TERMINAL_STAGES = [
