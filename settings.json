@@ -34,6 +34,23 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/track-file.py",
             "timeout": 5,
             "description": "跟踪所有文件变更"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/create-branch-from-session.sh",
+            "timeout": 60,
+            "description": "自动创建会话分支"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/create-branch-from-session.sh",
+            "timeout": 60,
+            "description": "自动创建会话分支"
           }
         ]
       }
