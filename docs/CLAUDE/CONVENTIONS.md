@@ -120,7 +120,73 @@ refactor: 重构订单处理逻辑以提高性能
 ### 项目信息文件
 - 每个子项目应有 `project.info` 文件
 - 由 `project-info-builder` 自动生成
+- **必须直接放在项目根目录**（例如：`{项目路径}/project.info`）
+- ❌ **禁止创建子目录**（如 `.work` 目录）
 - 包含项目结构、关键模块、函数签名等
+
+### 路径处理规范
+
+#### 绝对路径要求
+- ❌ **禁止使用相对路径** - 所有项目路径必须是绝对路径
+- ✅ **项目根目录** - `/mnt/d/software/beilv-agent`
+- ✅ **验证路径** - 在使用前用 `realpath` 或检查路径是否以 `/` 开头
+
+#### 禁止的目录结构
+- ❌ **禁止 `.work` 目录** - `project.info` 直接放在项目根目录，不要创建临时子目录
+- ❌ **禁止重复路径** - 如 `mall/mall`，必须检查路径拼接逻辑
+- ❌ **禁止临时子目录** - 不要在项目内创建用于存放 `project.info` 的临时目录
+
+#### 文件位置要求
+- **project.info** → `{项目绝对路径}/project.info`
+  - ✅ 正确：`/mnt/d/software/beilv-agent/mall/beilv-agent-web/project.info`
+  - ❌ 错误：`/mnt/d/software/beilv-agent/mall/beilv-agent-web/.work/project.info`
+- **会话文件** → `/mnt/d/software/beilv-agent/.claude/sessions/{session-id}/`
+- **工作流文件** → 必须在 `.claude/sessions/` 目录下，不能在项目子目录
+
+#### 代理工作目录规则
+
+1. **启动时明确工作目录** - 每个代理 prompt 中应包含：
+   ```bash
+   cd /mnt/d/software/beilv-agent || { echo "错误：无法切换目录"; exit 1; }
+   pwd  # 确认当前目录
+   ```
+
+2. **使用绝对路径操作文件** - 例如：
+   ```bash
+   # ✅ 正确
+   cat /mnt/d/software/beilv-agent/mall/beilv-agent-web/project.info
+
+   # ❌ 错误（容易导致路径拼接错误）
+   cd mall/beilv-agent-web && cat project.info
+   ```
+
+3. **验证路径正确性** - 在关键操作前：
+   ```bash
+   PROJECT_PATH="/mnt/d/software/beilv-agent/mall/beilv-agent-web"
+
+   # 验证是绝对路径
+   if [[ ! "$PROJECT_PATH" = /* ]]; then
+       echo "错误：必须使用绝对路径"
+       exit 1
+   fi
+
+   # 验证目录存在
+   if [[ ! -d "$PROJECT_PATH" ]]; then
+       echo "错误：项目路径不存在"
+       exit 1
+   fi
+
+   # 检查重复路径段（如 mall/mall）
+   if [[ "$PROJECT_PATH" =~ (.*/)([^/]+)/\2 ]]; then
+       echo "错误：检测到重复路径段"
+       exit 1
+   fi
+   ```
+
+4. **路径拼接规则**
+   - 使用 `${BASE_PATH}/${SUB_PATH}` 格式拼接路径
+   - 确保中间只有一个 `/` 分隔符
+   - 避免使用 `cd` 命令改变工作目录后再拼接相对路径
 
 ### 任务文档
 - 所有任务在 `plan-output/` 目录下

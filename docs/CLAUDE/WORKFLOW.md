@@ -122,15 +122,78 @@ Read: .claude/sessions/{session-id}/workflow/session.md
    ls -la {项目根目录}/project.info
    ```
 
-2. **若缺失，调用 project-info-builder**
+2. **若缺失，先验证路径，再调用 project-info-builder**
+
+   **⚠️ 路径验证（必须）**：
+   ```bash
+   # 确保在项目根目录执行
+   cd /mnt/d/software/beilv-agent || { echo "错误：无法切换目录"; exit 1; }
+
+   # 验证项目路径（使用绝对路径）
+   PROJECT_PATH="/mnt/d/software/beilv-agent/{项目相对路径}"
+
+   # 验证是绝对路径
+   if [[ ! "$PROJECT_PATH" = /* ]]; then
+       echo "❌ 错误：必须使用绝对路径"
+       exit 1
+   fi
+
+   # 验证目录存在
+   if [[ ! -d "$PROJECT_PATH" ]]; then
+       echo "❌ 错误：项目路径不存在: $PROJECT_PATH"
+       exit 1
+   fi
+
+   # 检查重复路径段
+   if [[ "$PROJECT_PATH" =~ (.*/)([^/]+)/\2 ]]; then
+       echo "❌ 错误：检测到重复路径段: $PROJECT_PATH"
+       exit 1
+   fi
+
+   echo "✅ 项目路径验证通过: $PROJECT_PATH"
+   ```
+
+   **调用代理**：
    ```python
    Task(
        subagent_type="project-info-builder",
        description="构建{项目名}信息",
        prompt=f"""
-       请为项目生成 project.info 文件：
-       - 项目路径：{project_path}
-       - 输出位置：{project_path}/project.info
+**[工作目录]**
+- 框架根目录：/mnt/d/software/beilv-agent
+- 当前项目：{project_path}（绝对路径）
+
+**[任务要求]**
+请为项目生成 project.info 文件：
+- 项目路径：{project_path}
+- 输出位置：{project_path}/project.info
+
+**[路径约束 - 必须遵守]**
+- ❌ **禁止创建 .work 目录** - project.info 必须直接在项目根目录
+- ❌ **禁止使用相对路径** - 所有路径必须是绝对路径
+- ✅ **使用绝对路径** - 验证路径以 / 开头
+- ✅ **验证路径存在** - 在写入前检查目录是否存在
+- ❌ **禁止重复路径** - 检查是否有 mall/mall 等重复路径段
+
+**[验证步骤]**
+在写入文件前执行：
+```bash
+# 1. 验证是绝对路径
+if [[ ! "{project_path}" = /* ]]; then
+    echo "错误：必须使用绝对路径"
+    exit 1
+fi
+
+# 2. 验证目录存在
+if [[ ! -d "{project_path}" ]]; then
+    echo "错误：项目目录不存在"
+    exit 1
+fi
+
+# 3. 直接写入项目根目录
+output_file="{project_path}/project.info"
+echo "输出文件: $output_file"
+```
        """
    )
    ```
