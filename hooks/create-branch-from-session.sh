@@ -82,11 +82,16 @@ wait_for_session_md() {
 }
 
 # 从 session.md 提取涉及的项目列表
+# 期望格式：
+#   ## 涉及项目
+#   1. beilv-agent-web
+#   2. beilv-agent
+# 注：仅支持项目名称，不支持完整路径
 extract_involved_projects() {
     local session_md="$1"
 
     # 提取 "## 涉及项目" 到下一个 ## 之间的内容
-    # 匹配各种格式并过滤数字和标题
+    # 匹配项目名称（如 beilv-agent-web）或带 mall/ 前缀的名称
     awk '/## 涉及项目/,/^## [^涉]/' "$session_md" | \
         grep -oP '(?:mall/)?[a-zA-Z][a-zA-Z0-9_-]+' | \
         sed 's|^mall/||' | \

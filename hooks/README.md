@@ -188,7 +188,10 @@ Task(
 实现积分扣减系统，参考 .plan/106-积分扣减系统设计与实现/plan.md
 
 ## 涉及项目
-{project-2}, {project-3}
+1. beilv-agent
+2. beilv-agent-web
+
+注：此处填写项目名称（来自 .claude/PROJECT.md 的 name 字段），不要填写完整路径。
 """
 )
 ```

@@ -86,7 +86,10 @@ cat > ".claude/sessions/${SESSION_ID}/workflow/session.md" <<'EOF'
 {完整的用户需求}
 
 ## 涉及项目
-1. {项目路径}
+1. {项目名称}
+
+**重要**：此处仅填写项目名称（如 `beilv-agent-web`），不要填写完整路径。
+项目名称需与 `.claude/PROJECT.md` 配置文件中的 `name` 字段匹配。
 
 ## 需求分类
 - 类型：{新功能|bug修复|重构|优化}
