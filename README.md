@@ -10,7 +10,6 @@
 ```
 .claude/
 ├── agents/                      # 子代理定义目录
-│   ├── workflow-orchestrator.md # 工作流编排代理
 │   ├── project-info-builder.md  # 项目信息构建代理
 │   ├── project-info-updater.md  # 项目信息更新代理
 │   ├── issue-analyzer.md        # 问题分析代理
@@ -42,12 +41,12 @@
 
 本框架采用**多代理协同**的设计理念，将复杂的软件开发流程拆分为多个专职子代理，每个代理负责特定的职责：
 
-- **编排层**：workflow-orchestrator 统筹全局
+- **主代理**：直接调度所有子代理，统筹全局工作流
 - **分析层**：issue-analyzer、analysis-aggregator 深度分析项目
 - **计划层**：master-planner、plan-splitter 制定和拆分实施计划
 - **执行层**：code-executor、test-runner 实现代码和测试
 - **质量层**：code-auditor、auto-fixer 保障代码质量
-- **总结层**：task-summarizer 汇总任务成果
+- **总结层**：task-summarizer、project-info-builder、project-info-updater 汇总任务成果和维护项目信息
 
 ### 工作流生命周期
 
@@ -107,9 +106,9 @@ graph LR
 
 ```mermaid
 graph TB
-    Start([👤 用户提出编码需求]) --> WO[workflow-orchestrator<br/>🎯 工作流编排]
+    Start([👤 用户提出编码需求]) --> MainAgent[主代理<br/>🎯 解析需求并调度子代理]
 
-    WO --> CreateSession[📁 步骤0: 创建工作流会话<br/>生成session-id<br/>创建目录结构<br/>初始化session.md]
+    MainAgent --> CreateSession[📁 阶段0: 创建工作流会话<br/>生成session-id<br/>创建目录结构<br/>初始化session.md]
     CreateSession --> CheckInfo{检查 project.info}
 
     CheckInfo -->|❌ 缺失| PIB[project-info-builder<br/>📦 构建项目信息]
@@ -124,9 +123,7 @@ graph TB
     IA2 --> AA
     IAN --> AA
 
-    AA --> DecideWorkflow{需要完整<br/>工作流?}
-    DecideWorkflow -->|❌ 否<br/>简单需求| SimpleExec[直接执行简单修改]
-    DecideWorkflow -->|✅ 是<br/>复杂需求| MP[master-planner<br/>📋 总体计划制定]
+    AA --> MP[master-planner<br/>📋 总体计划制定]
 
     MP --> UserConfirm{👤 用户确认计划?}
     UserConfirm -->|🔄 修改| MP
@@ -164,10 +161,8 @@ graph TB
     FinalCheck -->|❌ 否| End
     PIU --> End([✨ 工作流完成])
 
-    SimpleExec --> End
-
     style Start fill:#90caf9,stroke:#333,stroke-width:3px
-    style WO fill:#e1bee7,stroke:#333,stroke-width:2px
+    style MainAgent fill:#e1bee7,stroke:#333,stroke-width:2px
     style CreateSession fill:#fce4ec,stroke:#333,stroke-width:2px
     style MP fill:#e1bee7,stroke:#333,stroke-width:2px
     style PS fill:#bbdefb,stroke:#333,stroke-width:2px
@@ -183,7 +178,7 @@ graph TB
 ```
 
 **关键节点说明**：
-- **🎯 workflow-orchestrator**：入口代理，负责整体编排
+- **🎯 主代理**：直接调度所有子代理，负责整体编排
 - **👤 用户确认**：master-planner 阶段必须等待用户批准
 - **🔄 任务执行循环**：串行执行，每个任务都经过 实现→测试→审计→总结
 - **🔧 失败恢复**：测试失败重新实现，审计失败自动修复或人工介入
@@ -196,7 +191,7 @@ graph TB
 ```
 用户需求
     ↓
-workflow-orchestrator（解析需求，识别涉及项目）
+主代理（解析需求，识别涉及项目，创建会话）
     ↓
 project-info-builder（如 project.info 不存在）
     ↓
@@ -333,25 +328,7 @@ project-info-updater（如需要）
 
 ## 子代理详解
 
-### 1. workflow-orchestrator（工作流编排代理）
-
-**职责**：
-- 接收和解析用户需求
-- 检查项目信息文件
-- 调度后续子代理
-- 维护工作流会话状态
-
-**关键输出**：
-- `.claude/sessions/{session-id}/workflow/session.md`
-
-**调用的子代理**：
-- project-info-builder
-- issue-analyzer
-- analysis-aggregator
-
----
-
-### 2. project-info-builder（项目信息构建代理）
+### 1. project-info-builder（项目信息构建代理）
 
 **职责**：
 - 首次扫描项目生成结构化信息
@@ -365,7 +342,7 @@ project-info-updater（如需要）
 
 ---
 
-### 3. issue-analyzer（问题分析代理）
+### 2. issue-analyzer（问题分析代理）
 
 **职责**：
 - 针对单个项目深度分析需求
@@ -379,7 +356,7 @@ project-info-updater（如需要）
 
 ---
 
-### 4. analysis-aggregator（分析汇总代理）
+### 3. analysis-aggregator（分析汇总代理）
 
 **职责**：
 - 汇总多个 issue-analyzer 的报告
@@ -393,7 +370,7 @@ project-info-updater（如需要）
 
 ---
 
-### 5. master-planner（总体计划制定代理）
+### 4. master-planner（总体计划制定代理）
 
 **职责**：
 - 根据汇总分析创建整体实施计划
@@ -413,7 +390,7 @@ project-info-updater（如需要）
 
 ---
 
-### 6. plan-splitter（计划拆分代理）
+### 5. plan-splitter（计划拆分代理）
 
 **职责**：
 - 将整体计划拆分为可执行的子任务
@@ -439,7 +416,7 @@ project-info-updater（如需要）
 
 ---
 
-### 7. code-executor（代码执行代理）
+### 6. code-executor（代码执行代理）
 
 **职责**：
 - 串行执行任务目录中的代码实现
@@ -459,7 +436,7 @@ project-info-updater（如需要）
 
 ---
 
-### 8. test-runner（测试运行代理）
+### 7. test-runner（测试运行代理）
 
 **职责**：
 - 针对单个任务运行限定范围的测试
@@ -477,7 +454,7 @@ project-info-updater（如需要）
 
 ---
 
-### 9. code-auditor（代码审计代理）
+### 8. code-auditor（代码审计代理）
 
 **职责**：
 - 对任务级代码进行质量审计
@@ -497,7 +474,7 @@ project-info-updater（如需要）
 
 ---
 
-### 10. auto-fixer（自动修复代理）
+### 9. auto-fixer（自动修复代理）
 
 **职责**：
 - 依据审计报告自动修复可确定的代码问题
@@ -515,7 +492,7 @@ project-info-updater（如需要）
 
 ---
 
-### 11. task-summarizer（任务总结代理）
+### 10. task-summarizer（任务总结代理）
 
 **职责**：
 - 任务完成后进行总结
@@ -531,7 +508,7 @@ project-info-updater（如需要）
 
 ---
 
-### 12. project-info-updater（项目信息更新代理）
+### 11. project-info-updater（项目信息更新代理）
 
 **职责**：
 - 在新增/删除文件或函数等结构性变更后
@@ -550,7 +527,7 @@ project-info-updater（如需要）
 
 | 文件路径 | 用途 | 生成者 | 更新者 |
 |---------|------|--------|--------|
-| `.claude/sessions/{session-id}/workflow/session.md` | 工作流会话记录 | workflow-orchestrator | 各代理 |
+| `.claude/sessions/{session-id}/workflow/session.md` | 工作流会话记录 | 主代理 | 各代理 |
 | `.claude/sessions/{session-id}/workflow/progress.json` | 进度跟踪 | plan-splitter | code-executor, task-summarizer |
 
 ### 分析文件
@@ -592,7 +569,7 @@ project-info-updater（如需要）
 ```
 1. 用户：我需要给 beilv-agent 添加用户认证功能
    ↓
-2. workflow-orchestrator 接收需求，检查 project.info
+2. 主代理接收需求，创建会话，检查 project.info
    ↓
 3. issue-analyzer 分析项目，定位认证模块
    ↓
@@ -624,7 +601,7 @@ project-info-updater（如需要）
 ```
 1. 用户：修复登录页面的验证码显示问题
    ↓
-2. workflow-orchestrator 解析需求（简单需求）
+2. 主代理解析需求，创建会话
    ↓
 3. issue-analyzer 定位问题代码
    ↓
@@ -726,7 +703,7 @@ project-info-updater（如需要）
 
 ### Q1: 如果 project.info 不存在怎么办？
 
-A: workflow-orchestrator 会自动调用 project-info-builder 生成。
+A: 主代理会自动调用 project-info-builder 生成。
 
 ### Q2: 如果测试一直失败怎么办？
 
@@ -753,11 +730,11 @@ A: 在 progress.json 中将任务状态改为 "pending"，重新调用 code-exec
 1. 在 `agents/` 目录创建新的 `.md` 文件
 2. 定义代理的 name, description, tools, model, color
 3. 编写代理的职责和工作流程
-4. 在 workflow-orchestrator 中添加调用逻辑
+4. 在 CLAUDE.md 中添加调用逻辑
 
 ### 修改工作流
 
-编辑 `workflow-orchestrator.md`，调整子代理的调用顺序和条件。
+编辑 `CLAUDE.md` 中的工作流阶段说明，调整子代理的调用顺序和条件。
 
 ### 自定义任务模板
 
@@ -776,6 +753,11 @@ A: 在 progress.json 中将任务状态改为 "pending"，重新调用 code-exec
 ---
 
 ## 版本历史
+
+- **v2.0.0** (2026-01-09)
+  - 移除 workflow-orchestrator，主代理直接调度
+  - 11个子代理
+  - 简化架构，提高效率
 
 - **v1.0.0** (2025-12-31)
   - 初始版本
