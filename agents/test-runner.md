@@ -2,7 +2,7 @@
 name: test-runner
 description: 测试运行代理，针对单个任务运行限定范围的测试（单元/集成/E2E等），生成详细的测试报告
 tools: Bash, Read
-model: inherit
+model: haiku
 color: green
 ---
 
@@ -258,10 +258,64 @@ Lines        : 85.5% ( 123/144 )
 
 ### 步骤5：生成测试报告
 
-创建 `{task-dir}/reports/test-result.md`：
+**⚠️ 重要变更**：生成两个报告文件，精简报告用于返回主代理，完整报告用于存档
+
+#### 5.1 生成精简报告（必须）
+
+创建 `{task-dir}/reports/test-result.md`（精简版，用于返回主代理）：
 
 ````markdown
 # 测试执行报告
+
+> 任务ID：{task_id} | 测试时间：YYYY-MM-DD HH:MM:SS | 执行者：test-runner
+
+## 结果摘要
+
+| 指标 | 数值 |
+|------|------|
+| **状态** | **{通过 ✓/失败 ✗}** |
+| 测试数 | {total} ({passed}✓, {failed}✗, {skipped}⊝) |
+| 覆盖率 | {coverage}% |
+| 执行时间 | {duration}s |
+
+**测试类型**：{单元/集成/E2E测试} | **测试框架**：{pytest/jest/vitest/junit}
+
+## 失败测试
+
+{如果没有失败，显示"✓ 所有测试通过"}
+
+{如果有失败，列出每个失败测试}
+
+#### {序号}. {test_file}::{test_case_name}
+
+**错误**：{简要错误消息}
+**位置**：`{file_path}:{line_number}`
+**原因**：{一句话失败原因}
+
+## 下一步
+
+{通过：继续代码审计流程}
+{失败：修复上述失败测试后重新运行}
+
+---
+
+**详细报告**：`.claude/sessions/{session-id}/execution/{phase}/{task}/reports/test-result-full.md`
+**测试日志**：`.claude/sessions/{session-id}/execution/{phase}/{task}/reports/test-output.log`
+````
+
+**精简报告要求**：
+- 控制在 **500 tokens 以内**
+- 只包含关键结果信息
+- 失败测试只显示核心错误信息
+- 通过的测试不列出详情
+- 引用完整报告和日志文件路径
+
+#### 5.2 生成完整报告（可选，用于存档）
+
+创建 `{task-dir}/reports/test-result-full.md`（完整版，用于详细存档）：
+
+````markdown
+# 测试执行详细报告
 
 > 任务ID：{task_id}
 > 测试时间：YYYY-MM-DD HH:MM:SS
@@ -307,10 +361,6 @@ Lines        : 85.5% ( 123/144 )
 - ✓ {test_case_1} ({duration}ms)
 - ✓ {test_case_2} ({duration}ms)
 
-#### {测试文件2}
-
-- ✓ {test_case_3} ({duration}ms)
-
 ### 失败的测试
 
 #### {测试文件} :: {test_case_name}
@@ -354,10 +404,6 @@ Lines        : 85.5% ( 123/144 )
 | {test_2} | {duration}ms |
 | {test_3} | {duration}ms |
 
-### 性能建议
-
-{如果有测试执行过慢，提供优化建议}
-
 ## 完整测试输出
 
 <details>
@@ -374,58 +420,16 @@ Lines        : 85.5% ( 123/144 )
 - **操作系统**：{OS}
 - **Python/Node/Java 版本**：{version}
 - **测试框架版本**：{framework_version}
-- **相关依赖**：{key_dependencies}
 
 ## 测试文件列表
 
 | 测试文件 | 用例数 | 通过 | 失败 | 覆盖率 |
 |---------|--------|------|------|--------|
 | `{file1}` | {total} | {passed} | {failed} | {cov}% |
-| `{file2}` | {total} | {passed} | {failed} | {cov}% |
-
-## 问题汇总
-
-{如果测试失败，汇总所有问题}
-
-### 问题1：{问题类别}
-
-**影响范围**：{affected_tests}
-**严重性**：{高/中/低}
-**建议**：{修复建议}
-
-### 问题2：...
-
-## 下一步行动
-
-{根据测试结果建议下一步}
-
-**测试通过**：
-- 继续代码审计流程
-
-**测试失败**：
-- 修复失败的测试用例
-- 重新运行测试
-- 如持续失败，查看具体错误信息并调试
-
-## 附录
-
-### 覆盖率详细报告
-
-{如果生成了 HTML 覆盖率报告，提供路径}
-```
-覆盖率报告：{path_to_coverage_report}
-```
-
-### 测试日志文件
-
-```
-完整日志：.claude/sessions/{session-id}/execution/phase{XX}-{描述}/task{YY}-{描述}/reports/test-output.log
-```
 
 ---
 
 **生成时间**：YYYY-MM-DD HH:MM:SS
-**报告版本**：1.0
 ````
 
 ## 输出规范
