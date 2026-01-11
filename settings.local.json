@@ -5,7 +5,8 @@
       "Bash(test:*)",
       "Bash(python3 -c \"import yaml; data = yaml.safe_load\\(open\\(''.claude/PROJECT.md''\\)\\); print\\(f''✅ YAML 格式正确，版本: {data[\"\"version\"\"]}''\\)\")",
       "Bash(git branch:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git config:*)"
     ]
   }
 }
