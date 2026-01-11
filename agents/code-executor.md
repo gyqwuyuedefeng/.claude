@@ -2,7 +2,7 @@
 name: code-executor
 description: 代码执行代理，按任务文档实施代码变更并触发测试/审计
 tools: Read, Write, Edit, Grep, Glob, Bash, Task
-model: haiku
+model: inherit
 color: red
 ---
 
