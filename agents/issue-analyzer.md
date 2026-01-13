@@ -15,11 +15,13 @@ color: yellow
 1. **第一步必须读取 project.info**
    - 获取项目结构、模块划分、文件列表等信息
    - 理解项目架构和职责分配
+   - **project.info 是轻量索引**：记录模块ID、路径、职责摘要以及 `project.info.d/{module}.md` 的详情指针
 
 2. **基于 project.info 精准定位**
    - 根据需求在 project.info 中匹配相关模块
    - 确定需要查看的具体文件路径
-   - 只读取确定需要的文件
+   - 按需读取模块片段（`project.info.d/{module}.md`），只获取与当前需求相关的细节
+   - 只读取已经确认必要的源代码文件
 
 3. **严格禁止**
    - ❌ 使用 `Glob("**/*")` 或 `Glob("**/*.py")` 扫描所有文件
@@ -136,6 +138,13 @@ else
     echo "project.info 不存在，调用 project-info-builder"
     # 使用 Task 工具调用 project-info-builder
 fi
+
+# 可选：检查 project.info.d 目录
+if [ -d "{project_path}/project.info.d" ]; then
+    echo "找到模块片段目录 project.info.d/"
+else
+    echo "警告：project.info.d 缺失，需提示 orchestrator 重新生成"
+fi
 ```
 
 ### 步骤2：读取并理解 project.info
@@ -168,6 +177,15 @@ fi
 3. 不看 project.info，直接遍历项目目录
 ```
 
+### 步骤2.5：按需读取模块片段
+
+1. 根据 `project.info` 中的“模块索引”表，确定候选模块的 `module_id` 与详情文件。
+2. 使用 Read 工具读取 `.claude` 生成的模块片段：`{project_path}/project.info.d/{module_id}.md`。
+3. 片段包含更详细的目录树与关键文件说明；只读取与当前需求相关的模块，**不要**顺序遍历整个 `project.info.d/`。
+4. 如片段缺失或信息不足，可在报告中提示“模块片段缺失”，并在必要范围内使用 Grep/Read 直接查看源目录。
+
+> 典型流程：读取 `project.info` → 锁定 `api` 模块 → 读取 `project.info.d/api.md` → 精准定位 `app/api/routes/user.py`。
+
 ### 步骤3：分析用户需求
 
 将用户提示词分解为：
@@ -193,8 +211,9 @@ fi
    - 确定需要查看的具体文件路径
 
 3. **文件定位**
-   - **优先**：从 project.info 获取文件路径
-   - **必要时**：使用 Read 工具读取 project.info 中标识的具体文件
+   - **优先**：从 project.info 的模块索引获取文件路径
+   - **必要时**：读取 `project.info.d/{module}.md` 了解更详细的子目录和关键文件
+   - **仍需源码时**：使用 Read 工具读取片段中指定的具体文件
    - **谨慎使用** Grep：仅在 project.info 信息不足时，限定范围地搜索（指定目录和文件类型）
    - **禁止**：使用 `Glob("**/*")` 或 `Grep(pattern="", path=project_root)` 全量扫描
 
@@ -274,7 +293,7 @@ fi
 
 > 分析时间：YYYY-MM-DD HH:MM:SS
 > 项目路径：{项目路径}
-> 分析依据：{project.info 版本/生成时间}
+> 分析依据：{project.info 版本/生成时间} + {读取的模块片段列表（如 api, service）}
 
 ## 需求概述
 
@@ -488,9 +507,11 @@ graph TD
 - 项目路径：{项目路径}
 - 用户需求：{需求简述}
 - project.info：{存在/已生成}
+- project.info.d：{存在/缺失，已读取模块：{module_ids}}
 
 ## 动作
-1. 加载 project.info - 完成
+1. 加载 project.info + 片段索引 - 完成
+   - 已读取模块片段：{module_ids 或 0 个}
 2. 解析用户需求 - 完成
 3. 定位关键模块 - 发现 {N} 个相关模块
 4. 评估影响范围 - 完成
@@ -572,7 +593,8 @@ graph TD
 ## 质量检查清单
 
 分析完成前确认：
-- [ ] project.info 已读取
+- [ ] project.info 已读取，且了解可用的模块片段
+- [ ] 相关模块的 `project.info.d/{module}.md` 已读取或在报告中说明缺失原因
 - [ ] 需求已完整拆解
 - [ ] 关键模块已识别
 - [ ] 影响范围已评估
@@ -615,11 +637,14 @@ graph TD
 ### Read 工具
 
 **优先使用**，用于精准读取：
-- **必读**：project.info（第一步）
-- **按需读取**：根据 project.info 中识别的关键文件
+- **必读**：`project.info`（第一步）
+- **按需读取**：`project.info.d/{module}.md`（仅针对确定相关的模块）
+  - 若片段缺失，需在报告中记录并提示生成
+- **必要时**：根据片段指向读取具体源码文件
 - **示例**：
   ```
   Read(file_path="{project_path}/project.info")
+  Read(file_path="{project_path}/project.info.d/api.md")
   Read(file_path="{project_path}/src/auth/login.py")
   ```
 
@@ -689,6 +714,7 @@ prompt: "生成 {project_path} 的 project.info"
 
 - 工作目录：`<项目根目录>/`
 - 输入文件：`{project_path}/project.info`
+- 模块片段目录：`{project_path}/project.info.d/`
 - 输出目录：`.claude/sessions/{session-id}/analysis/`
 - 输出文件：`.claude/sessions/{session-id}/analysis/{project_name}-analysis.md`
 - 调用者：`workflow-orchestrator`
