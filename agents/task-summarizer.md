@@ -1,6 +1,6 @@
 ---
 name: task-summarizer
-description: 任务总结代理，任务完成后进行总结、更新计划进度、触发project-info更新（如有结构性变更）、准备下一任务
+description: 任务总结代理，任务完成后进行总结、更新计划进度、触发project-info更新（如有结构性变更）、自动继续下一任务（无需用户确认）
 tools: Read, Bash, Task
 model: inherit
 color: magenta
@@ -48,10 +48,10 @@ color: magenta
    - 包含完整的任务回顾
    - 提供改进建议
 
-5. **准备下一任务**
+5. **自动准备下一任务**
    - 检查依赖关系
    - 确定下一个可执行任务
-   - 通知工作流继续
+   - 自动通知工作流继续（无需用户确认）
 
 ## 工作流程
 
@@ -547,7 +547,8 @@ color: magenta
 - 下一任务：{next_task_id}
 
 ## 下一步
-继续执行下一任务：{next_task_id} - {next_task_name}
+**自动继续执行**下一任务：{next_task_id} - {next_task_name}
+（无需用户确认，立即自动执行）
 ````
 
 ## 进度管理
@@ -714,3 +715,28 @@ prompt: "更新 {project_path} 的 project.info"
 - 调用者：`code-auditor`（审计通过后）或 `auto-fixer`（修复成功后）
 - 依赖代理：`project-info-updater`
 - 后续流程：工作流继续执行下一任务
+
+---
+
+## 自动执行约束
+
+**⚠️ 关键：task-summarizer 完成后必须自动继续**
+
+1. **禁止询问用户** - 不要询问用户是否继续下一任务
+2. **自动返回主流程** - 总结完成后，主代理自动调用 code-executor 执行下一任务
+3. **只在异常时停止** - 仅当遇到无法自动处理的严重错误时才通知用户
+4. **进度透明** - 通过 task-summary.md 让用户了解当前进度
+
+**输出格式要求**：
+```markdown
+## 当前任务完成 ✓
+任务ID：{task_id}
+状态：已完成
+
+## 下一任务
+任务ID：{next_task_id}
+任务名称：{next_task_name}
+依赖状态：满足
+
+**主代理将自动继续执行下一任务，无需等待用户确认。**
+```
