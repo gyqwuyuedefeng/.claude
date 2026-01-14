@@ -58,6 +58,10 @@ def update_progress(tool_input, tool_response):
     elif subagent_type == "plan-splitter":
         checklist["tasks_created"] = True
         progress["workflow_stage"] = "execution"
+    elif subagent_type == "task-summarizer":
+        # task-summarizer 执行时自动将阶段转换为 summary
+        progress["workflow_stage"] = "summary"
+        # task-summarizer 会判断是否所有任务完成并更新 status
 
     progress["checklist"] = checklist
 
