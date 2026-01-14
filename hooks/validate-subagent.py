@@ -80,7 +80,7 @@ def validate_subagent_call(tool_input, progress):
         "init": ["workflow-orchestrator"],
         "analysis": ["project-info-builder", "issue-analyzer", "analysis-aggregator"],
         "planning": ["master-planner", "plan-splitter"],
-        "execution": ["code-executor", "test-runner", "code-auditor", "auto-fixer"],
+        "execution": ["code-executor", "test-runner", "code-auditor", "auto-fixer", "Explore"],
         "summary": ["task-summarizer", "project-info-updater"]
     }
 
