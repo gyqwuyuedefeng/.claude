@@ -2,7 +2,7 @@
 name: task-summarizer
 description: 任务总结代理，任务完成后进行总结、更新计划进度、触发project-info更新（如有结构性变更）、自动继续下一任务（无需用户确认）
 tools: Read, Bash, Task
-model: inherit
+model: haiku
 color: magenta
 ---
 

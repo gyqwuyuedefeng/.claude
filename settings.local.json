@@ -9,7 +9,9 @@
       "Bash(git config:*)",
       "Bash(python3:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: 修复测试链路缺少意图识别会话启动步骤导致的状态验证失败\n\n问题：\n- 项目创建后状态为 PENDING\n- 直接调用 submit_intent_answer 时要求状态为 ASKING\n- 导致抛出 HTTPException: \"当前不在对话阶段\"\n\n解决：\n- 在提交回答前增加调用 start_intent_conversation\n- 将项目状态从 PENDING 改为 ASKING\n- 完全遵循正式链路的完整流程：创建项目 → 启动会话 → 提交回答\n\n修改内容：\n- 在 create_single_test_task 中增加步骤5：启动意图识别会话\n- 增加异常处理，即使启动失败也会继续尝试提交回答\n- 更新注释编号，保持代码结构清晰\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: 修复测试链路缺少意图识别会话启动步骤导致的状态验证失败\n\n问题：\n- 项目创建后状态为 PENDING\n- 直接调用 submit_intent_answer 时要求状态为 ASKING\n- 导致抛出 HTTPException: \"当前不在对话阶段\"\n\n解决：\n- 在提交回答前增加调用 start_intent_conversation\n- 将项目状态从 PENDING 改为 ASKING\n- 完全遵循正式链路的完整流程：创建项目 → 启动会话 → 提交回答\n\n修改内容：\n- 在 create_single_test_task 中增加步骤5：启动意图识别会话\n- 增加异常处理，即使启动失败也会继续尝试提交回答\n- 更新注释编号，保持代码结构清晰\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(ls:*)",
+      "Bash(find:*)"
     ]
   }
 }
