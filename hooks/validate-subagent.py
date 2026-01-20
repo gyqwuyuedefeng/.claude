@@ -46,8 +46,52 @@ def infer_workflow_stage(progress):
     # 规则4：完全空白 → 允许启动新会话
     return ""
 
+def is_new_conversation_context(tool_input, progress):
+    """判断是否是新的对话上下文
+
+    逻辑:
+    1. 如果传入了 conversation_id,且与当前会话的 conversation_id 不同 → 新上下文
+    2. 如果传入了 force_new_session 标志 → 新上下文
+    3. 如果当前会话已完成(status为终态) → 新上下文
+    4. 其他情况 → 同一上下文
+    """
+    if not progress:
+        return True  # 无会话状态,视为新上下文
+
+    # 检查 conversation_id
+    current_conversation_id = tool_input.get("conversation_id")
+    if current_conversation_id:
+        progress_conversation_id = progress.get("conversation_id")
+        if progress_conversation_id and progress_conversation_id != current_conversation_id:
+            print(f"ℹ️  检测到新对话上下文 (conversation_id: {current_conversation_id})", file=sys.stderr)
+            return True
+
+    # 检查 force_new_session 标志
+    if tool_input.get("force_new_session"):
+        print("ℹ️  检测到 force_new_session 标志", file=sys.stderr)
+        return True
+
+    # 检查会话是否已完成
+    current_status = progress.get("status", "")
+    TERMINAL_STATUSES = ["completed", "failed", "testing_completed_with_issues", "cancelled"]
+    if current_status in TERMINAL_STATUSES:
+        print(f"ℹ️  当前会话已完成 (status: {current_status}),允许启动新会话", file=sys.stderr)
+        return True
+
+    return False  # 同一对话上下文
+
 def validate_subagent_call(tool_input, progress):
     """验证子代理调用是否符合当前阶段"""
+
+    # 【新增】检查是否是新对话上下文
+    if is_new_conversation_context(tool_input, progress):
+        subagent_type = tool_input.get("subagent_type", "")
+        # 在新对话上下文中,允许启动 workflow-orchestrator 或其他初始化代理
+        ALLOWED_IN_NEW_CONTEXT = ["workflow-orchestrator", "issue-analyzer", "project-info-builder"]
+        if subagent_type in ALLOWED_IN_NEW_CONTEXT:
+            print(f"✅ 新对话上下文,允许调用 {subagent_type}", file=sys.stderr)
+            return True, None
+
     if not progress:
         # 无工作流状态，可能是首次调用
         return True, None
@@ -60,20 +104,6 @@ def validate_subagent_call(tool_input, progress):
     # 【新增】当 stage 为空但 progress 有内容时，自动推断阶段
     if not stage and progress:
         stage = infer_workflow_stage(progress)
-
-    # 定义终态：允许在这些状态下启动新会话
-    TERMINAL_STAGES = [
-        "completed",                      # 正常完成
-        "failed",                         # 失败
-        "testing_completed_with_issues",  # 测试完成但有问题
-        "cancelled",                      # 用户取消
-        ""                                # 空字符串表示未初始化
-    ]
-
-    # 特殊处理：允许在终态下启动新的 workflow-orchestrator
-    # 这样用户可以在上一个会话完成后启动全新的独立会话
-    if subagent_type == "workflow-orchestrator" and stage in TERMINAL_STAGES:
-        return True, None
 
     # 定义阶段-子代理映射
     STAGE_AGENTS = {
