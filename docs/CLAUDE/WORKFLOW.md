@@ -18,6 +18,29 @@
 
 **这是工作流的第一步，必须在任何其他操作之前完成！**
 
+### ⚠️ 会话路径规范（强制）
+
+**会话目录固定规则**：
+- ✅ 所有会话**必须**创建在 `.claude/sessions/` 目录下
+- ✅ 会话目录格式：`{序号}-{描述}-{YYYYMMDD}-{HHMM}`
+- ✅ 所有会话文件**必须**写入会话目录内
+
+**严格禁止**：
+- ❌ 禁止在项目其他位置创建会话目录
+- ❌ 禁止使用用户提供的文件路径作为会话目录
+- ❌ 禁止在 `.plan/`、`/tmp/` 等临时目录创建会话
+
+**示例**：
+```bash
+# ❌ 错误：使用用户提供的路径
+user_plan="/path/to/.plan/project/plan.md"
+session_dir=$(dirname "$user_plan")  # 错误！
+
+# ✅ 正确：固定在 .claude/sessions/ 下
+session_id="007-描述-20260120-1136"
+session_dir=".claude/sessions/$session_id"
+```
+
 ### 步骤0.1：生成会话ID
 
 使用 Bash 工具执行以下脚本：
@@ -107,11 +130,47 @@ EOF
 echo "会话文件创建成功"
 ```
 
-### 步骤0.4：验证会话创建
+### 步骤0.4：创建进度跟踪文件
+
+```bash
+# 使用上面的 SESSION_ID
+SESSION_ID="XXX-描述-YYYYMMDD-HHMM"  # 【必须替换】
+
+cd /mnt/d/software/beilv-agent || exit 1
+
+# 创建 progress.json
+cat > ".claude/sessions/${SESSION_ID}/workflow/progress.json" <<EOF
+{
+  "session_id": "${SESSION_ID}",
+  "workflow_stage": "init",
+  "status": "in_progress",
+  "checklist": {
+    "session_created": true,
+    "project_info_checked": false,
+    "analysis_started": false,
+    "analysis_completed": false,
+    "user_approved_plan": false,
+    "tasks_created": false
+  },
+  "created_at": "$(date -Iseconds)",
+  "updated_at": "$(date -Iseconds)"
+}
+EOF
+
+echo "进度文件创建成功"
+```
+
+验证：
+```bash
+cat ".claude/sessions/${SESSION_ID}/workflow/progress.json" | python3 -m json.tool
+```
+
+### 步骤0.5：验证会话创建
 
 使用 Read 工具验证文件是否创建成功：
 ```
 Read: .claude/sessions/{session-id}/workflow/session.md
+Read: .claude/sessions/{session-id}/workflow/progress.json
 ```
 
 **⚠️ 如果验证失败，必须停止流程并报告错误！**

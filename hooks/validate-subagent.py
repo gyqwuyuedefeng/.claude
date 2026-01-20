@@ -5,6 +5,7 @@
 import json
 import sys
 import os
+import datetime
 from pathlib import Path
 
 def load_progress():
@@ -19,8 +20,26 @@ def load_progress():
         return None
 
     progress_file = sessions[0] / "workflow" / "progress.json"
+
+    # 【修复】当 progress.json 不存在时，自动创建初始状态
     if not progress_file.exists():
-        return None
+        print("⚠️  progress.json 不存在，自动创建初始状态", file=sys.stderr)
+        session_id = sessions[0].name
+        initial_progress = {
+            "session_id": session_id,
+            "workflow_stage": "init",
+            "status": "in_progress",
+            "checklist": {
+                "session_created": True
+            },
+            "created_at": datetime.datetime.now().isoformat(),
+            "updated_at": datetime.datetime.now().isoformat()
+        }
+        progress_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(progress_file, 'w') as f:
+            json.dump(initial_progress, f, indent=2)
+        print(f"✅ 已自动创建 progress.json: {progress_file}", file=sys.stderr)
+        return initial_progress
 
     with open(progress_file) as f:
         return json.load(f)
