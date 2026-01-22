@@ -139,12 +139,28 @@ AskUserQuestion(
 - **选项1：完整工作流**
   - **不进入 Plan Mode**
   - 直接启动阶段0开始的完整流程（详见 [WORKFLOW.md](.claude/docs/CLAUDE/WORKFLOW.md)）
+  - 创建会话目录：`.claude/sessions/{session-id}/`
   - 通过子代理系统完成：issue-analyzer → master-planner → plan-splitter → code-executor
+  - 包含完整的质量保证流程：测试验证 + 代码审计
 
 - **选项2：快速执行**
   - 使用 `EnterPlanMode` 工具进入 Plan Mode
   - 在 Plan Mode 中规划实施方案
-  - 退出 Plan Mode 后执行修改
+  - 使用 `ExitPlanMode` 退出后直接执行修改
+
+  **快速执行的特点**：
+  - ✅ **完全跳过工作流步骤** - 不创建会话目录，不进入工作流
+  - ✅ 使用默认工具（Read、Edit、Write、Bash等）直接修改代码
+  - ✅ 适合简单的单文件修改、配置调整或文档编辑
+  - ❌ **不调用工作流中的任何子代理**：
+    - 不调用 `issue-analyzer`、`analysis-aggregator`（不进行需求分析）
+    - 不调用 `master-planner`、`plan-splitter`（不制定正式计划）
+    - 不调用 `code-executor`（直接使用默认工具）
+    - 不调用 `test-runner`、`test-code-writer`（不自动化测试）
+    - 不调用 `code-auditor`、`auto-fixer`（不进行审计和自动修复）
+    - 不调用 `task-summarizer`、`project-info-updater`（不更新会话）
+  - ⚠️ 质量保证由主代理手动控制，适合低风险变更
+  - ⚠️ 不生成工作流文档和执行报告
 
 ### 关键要点
 
@@ -154,6 +170,27 @@ AskUserQuestion(
 4. **让用户选择** - 不要替用户做决定
 5. **提供建议** - 根据复杂度推荐合适的方式（在选项标签中标注"推荐"）
 6. **质量优先** - 即使快速执行也要确保基本质量
+
+### 两种模式的对比
+
+| 对比项 | 完整工作流 | 快速执行 |
+|--------|-----------|---------|
+| 适用场景 | 复杂任务、多文件修改 | 简单修改、配置调整 |
+| 工作方式 | 多代理协同（12个代理） | Plan Mode + 默认工具 |
+| 会话目录 | 创建 `.claude/sessions/` | 不创建会话目录 |
+| 需求分析 | issue-analyzer（深度分析） | 主代理简单分析 |
+| 计划制定 | master-planner（结构化计划） | Plan Mode规划 |
+| 代码实现 | code-executor（业务代码专用） | 默认工具（Read/Edit/Write） |
+| 测试创建 | test-code-writer（自动创建测试） | 不创建测试 |
+| 测试运行 | test-runner（自动运行测试） | 不运行测试 |
+| 代码审计 | code-auditor（质量审计） | 不进行审计 |
+| 自动修复 | auto-fixer（自动修复问题） | 不自动修复 |
+| 进度跟踪 | task-summarizer（自动更新） | 无进度跟踪 |
+| 项目信息 | project-info-updater（自动更新） | 不更新 |
+| 质量保证 | 完整（测试+审计） | 基本（手动控制） |
+| 用户确认 | 1次（计划批准后自动执行） | 多次（Plan批准+执行确认） |
+| 执行报告 | 生成详细报告和文档 | 不生成报告 |
+| 子代理调用 | 调用工作流中的12个子代理 | 不调用任何工作流子代理 |
 
 ---
 
@@ -183,7 +220,7 @@ AskUserQuestion(
 
 ---
 
-**框架版本**：2.2.0
+**框架版本**：2.3.0
 **更新时间**：2026-01-22
 **架构**：主代理直接调度，12个子代理协同
-**更新说明**：新增 test-code-writer 代理，职责分离优化 - code-executor 负责业务代码，test-code-writer 专职测试代码
+**更新说明**：明确快速执行模式完全跳过工作流，不创建会话目录，不调用任何工作流定义的子代理，直接使用 Plan Mode + 默认工具执行
