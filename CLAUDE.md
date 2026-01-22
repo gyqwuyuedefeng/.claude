@@ -35,9 +35,10 @@
        → 阶段5：等待用户确认（必须，唯一确认点）
        → 阶段6：调用 plan-splitter 拆分任务
        → 阶段7-N：任务执行循环（自动连续执行，无需用户确认）
-         ├─ code-executor
-         ├─ test-runner
-         ├─ code-auditor
+         ├─ code-executor（实现业务代码）
+         ├─ test-code-writer（创建测试代码）
+         ├─ test-runner（运行测试）
+         ├─ code-auditor（代码审计）
          └─ task-summarizer（自动继续下一任务）
 ```
 
@@ -182,7 +183,7 @@ AskUserQuestion(
 
 ---
 
-**框架版本**：2.1.0
-**更新时间**：2026-01-09
-**架构**：主代理直接调度，11个子代理协同
-**更新说明**：修复工作流决策逻辑 - 在进入 Plan Mode 前询问执行方式
+**框架版本**：2.2.0
+**更新时间**：2026-01-22
+**架构**：主代理直接调度，12个子代理协同
+**更新说明**：新增 test-code-writer 代理，职责分离优化 - code-executor 负责业务代码，test-code-writer 专职测试代码

@@ -445,7 +445,7 @@ Read: .claude/sessions/{session-id}/workflow/progress.json
 1. **自动连续执行所有任务** - 无需在任务间询问用户是否继续
 2. **只在异常时停止** - 仅当遇到无法自动处理的错误时才通知用户
 3. **禁止主动等待** - task-summarizer 完成后立即继续下一任务
-4. **完整执行循环** - 每个任务必须完成所有4个步骤（实现→测试→审计→总结）
+4. **完整执行循环** - 每个任务必须完成所有5个步骤（实现→测试代码→测试→审计→总结）
 
 **对于每个任务，串行执行以下步骤**：
 
@@ -464,11 +464,42 @@ Task(
 {从 task.md 读取的内容}
 
 **[任务要求]**
-请实现该任务并生成任务报告：
-.claude/sessions/{session_id}/execution/phase{X}/task{Y}/reports/task-report.md
+请实现该任务的业务代码（不包括测试代码）并生成执行报告：
+.claude/sessions/{session_id}/execution/phase{X}/task{Y}/reports/execution.md
+
+**[重要约束]**
+- 只修改业务代码，不要创建测试代码
+- 测试代码将由 test-code-writer 代理单独创建
     """
 )
 ```
+
+### 7.1.5 创建测试代码
+
+```python
+Task(
+    subagent_type="test-code-writer",
+    description="创建任务{task-id}的测试代码",
+    prompt=f"""
+**[会话信息]**
+- 会话ID: {session_id}
+- 任务目录: .claude/sessions/{session_id}/execution/phase{X}/task{Y}/
+
+**[任务要求]**
+请根据业务代码变更创建/更新测试代码：
+1. 读取 execution.md 了解代码变更
+2. 创建/更新对应的测试文件
+3. 生成测试创建报告：reports/test-code-creation.md
+
+**[重要约束]**
+- 优先更新现有测试文件，避免重复
+- 遵循项目测试框架和风格
+- 覆盖正常流程、边界情况、异常处理
+    """
+)
+```
+
+**如果测试代码创建失败** → 记录问题并通知用户
 
 ### 7.2 运行测试
 
@@ -567,10 +598,10 @@ Task(
 
 ## 多代理系统
 
-**11个子代理**：
+**12个子代理**：
 - **分析层**：issue-analyzer（分析项目）, analysis-aggregator（汇总分析）
 - **计划层**：master-planner（制定计划）, plan-splitter（拆分任务）
-- **执行层**：code-executor（代码实现）, test-runner（运行测试）
+- **执行层**：code-executor（代码实现）, test-code-writer（创建测试代码）, test-runner（运行测试）
 - **质量层**：code-auditor（代码审计）, auto-fixer（自动修复）
 - **维护层**：task-summarizer（任务总结）, project-info-builder（构建信息）, project-info-updater（更新信息）
 
