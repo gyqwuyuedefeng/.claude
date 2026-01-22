@@ -170,7 +170,7 @@ mkdir -p ".claude/sessions/{session-id}/execution/phase01-基础设施和数据�
 
 # 为每个任务创建目录和子目录
 # 例如：task01-数据库设计
-mkdir -p ".claude/sessions/{session-id}/execution/phase01-基础设施和数据层/task01-数据库设计/{audit,reports}"
+mkdir -p ".claude/sessions/{session-id}/execution/phase01-基础设施和数据层/task01-数据库设计/reports"
 ```
 
 标准目录结构：
@@ -884,7 +884,7 @@ Task 1.1 → Task 1.2 → Task 2.1 → Task 2.4 → Task 3.1 → Task 3.3
 ### Bash 工具
 ```bash
 # 创建目录结构
-mkdir -p ".claude/sessions/{session-id}/execution/phase01-{name}/task01-{name}/{audit,reports}"
+mkdir -p ".claude/sessions/{session-id}/execution/phase01-{name}/task01-{name}/reports"
 
 # 批量创建多个目录
 for phase in phase01 phase02 phase03; do
